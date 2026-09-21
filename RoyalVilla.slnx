@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="RoyalVilla.DTO/RoyalVilla.DTO.csproj" Id="8dff4248-ce23-49d9-a671-86c04b8b9391" />
+  <Project Path="RoyalVillaWeb/RoyalVillaWeb.csproj" Id="3e54ae27-3ec9-43a3-906b-66546adf1fe8" />
+  <Project Path="RoyalVilla_API/RoyalVilla_API.csproj" />
+</Solution>

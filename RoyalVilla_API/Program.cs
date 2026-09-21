@@ -1,0 +1,125 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi;
+using RoyalVilla.DTO;
+using RoyalVilla_API.Data;
+using RoyalVilla_API.Models;
+using RoyalVilla_API.Services;
+using Scalar.AspNetCore;
+using System.Security.Claims;
+using System.Text;
+
+var builder = WebApplication.CreateBuilder(args);
+// Add jwt (Manual)
+var key = Encoding.ASCII.GetBytes(builder.Configuration.GetSection("JwtSettings")["Secret"]);
+
+//Add AddAuthentication (Manual)
+builder.Services.AddAuthentication(option =>
+{
+    option.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    option.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    option.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(options =>
+{
+    options.RequireHttpsMetadata = false;
+    options.SaveToken = true;
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(key),
+        ValidateIssuer = false,
+        ValidateAudience = false,
+        ValidateLifetime = true,
+        ClockSkew = TimeSpan.Zero,
+        NameClaimType = ClaimTypes.Name,
+        RoleClaimType = ClaimTypes.Role,
+    };
+
+});
+
+builder.Services.AddCors();
+
+// Add services to the container. (Manual)
+builder.Services.AddDbContext<ApplicationDbContext>(option =>
+{
+    option.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+});
+builder.Services.AddControllers();
+
+builder.Services.AddOpenApi(options =>
+{
+    options.AddDocumentTransformer((document, context, CancellationToken) =>
+    {
+        document.Components = new();
+        document.Components.SecuritySchemes = new Dictionary<string, IOpenApiSecurityScheme>
+        {
+            ["Bearer"] = new OpenApiSecurityScheme
+            {
+                Type = SecuritySchemeType.Http,
+                Scheme = "bearer",
+                BearerFormat = "JWT",
+                Description = "Enter JWT Bearer token"
+            }
+        };
+        document.Security =
+        [
+            new OpenApiSecurityRequirement{
+                {new OpenApiSecuritySchemeReference("Bearer"), new List<String>() }
+            }
+        ];
+        return Task.CompletedTask;
+
+    });
+
+});
+
+
+
+
+//Auto mapper (Manual)
+builder.Services.AddAutoMapper(o =>
+{
+    o.CreateMap<Villa, VillaCreateDTO>().ReverseMap();
+    o.CreateMap<Villa, VillaUpdateDTO>().ReverseMap();
+    o.CreateMap<Villa, VillaDTO>().ReverseMap();
+    o.CreateMap<VillaUpdateDTO, VillaDTO>().ReverseMap();
+    o.CreateMap<User, UserDTO>().ReverseMap();
+    o.CreateMap<VillaAmenities, VillaAmentiesCreateDTO>().ReverseMap();
+    o.CreateMap<VillaAmenities, VillaAmentiesUpdateDTO>().ReverseMap();
+    o.CreateMap<VillaAmenities, VillaAmentiesDTO>()
+    .ForMember(dest => dest.VillaName, opt => opt.MapFrom(src => src.Villa != null ? src.Villa.Name : null));
+    o.CreateMap<VillaAmentiesDTO, VillaAmenities>();
+});
+builder.Services.AddScoped<IAuthService, AuthService>();
+
+var app = builder.Build();
+await SeedDataAsync(app);
+
+//  ADDED: Configure OpenAPI & Scalar Endpoints
+if (app.Environment.IsDevelopment())
+{
+    app.MapOpenApi();              // Serves /openapi/v1.json
+    app.MapScalarApiReference();   // Serves /scalar/v1
+}
+
+// Allow Origin (Manual)
+app.UseCors(o => o.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod().WithExposedHeaders("*"));
+app.UseHttpsRedirection();
+app.UseAuthentication(); //Configure Authentication (Manual)
+app.UseAuthorization();
+
+app.MapControllers();
+
+app.Run();
+
+
+static async Task SeedDataAsync(WebApplication app)
+{
+    using var scope = app.Services.CreateScope();
+    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+    await context.Database.MigrateAsync();
+}
