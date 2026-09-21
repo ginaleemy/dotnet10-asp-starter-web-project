@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JPA vs EF Core — Relationship Mapping Reference</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/nord.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/java.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/csharp.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/sql.min.js"></script>
+<style>
+  :root{
+    --bg:#0F1115;
+    --panel:#151822;
+    --panel-2:#12141b;
+    --ink:#E7E8EC;
+    --ink-dim:#9498A6;
+    --hair:#262A36;
+    --java:#E8792E;      /* Java/Spring coffee-orange */
+    --java-dim:#3A2A1D;
+    --dotnet:#8A5CF6;    /* .NET brand purple, shifted for dark bg */
+    --dotnet-dim:#241E3A;
+    --sidebar-w: 264px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Inter',system-ui,-apple-system,sans-serif;
+    line-height:1.55;
+  }
+  code, pre, .mono{font-family:'Fira Code',ui-monospace,Consolas,monospace;}
+
+  /* ---------- Sidebar ---------- */
+  .sidebar{
+    position:fixed; top:0; left:0; bottom:0; width:var(--sidebar-w);
+    background:var(--panel-2);
+    border-right:1px solid var(--hair);
+    padding:28px 18px;
+    overflow-y:auto;
+  }
+  .brand{
+    font-weight:800; font-size:15px; letter-spacing:.01em;
+    color:var(--ink); margin:0 8px 4px;
+  }
+  .brand span{color:var(--ink-dim); font-weight:500;}
+  .brand-sub{
+    font-size:12px; color:var(--ink-dim); margin:0 8px 26px; font-weight:500;
+  }
+  .nav-group-label{
+    font-size:11px; color:var(--ink-dim); margin:20px 8px 8px;
+    font-weight:600;
+  }
+  .nav-group-label:first-of-type{margin-top:0;}
+  .sidebar nav a{
+    display:flex; align-items:center; gap:9px;
+    color:var(--ink-dim); text-decoration:none;
+    font-size:13.5px; font-weight:500;
+    padding:8px 8px; border-radius:7px;
+    transition:background .15s ease, color .15s ease;
+  }
+  .sidebar nav a .dot{
+    width:5px; height:5px; border-radius:50%;
+    background:var(--hair); flex:none;
+    transition:background .15s ease, transform .15s ease;
+  }
+  .sidebar nav a:hover{color:var(--ink); background:#1B1F2A;}
+  .sidebar nav a.active{color:var(--ink); background:#1B1F2A;}
+  .sidebar nav a.active .dot{background:var(--java); transform:scale(1.4);}
+
+  /* ---------- Main ---------- */
+  .main{margin-left:var(--sidebar-w); padding:56px 48px 120px; max-width:1080px;}
+  header.hero{margin-bottom:56px;}
+  header.hero h1{
+    font-size:33px; font-weight:800; letter-spacing:-.015em; margin:0 0 14px;
+  }
+  header.hero h1 .vs{
+    color:var(--ink-dim); font-weight:500; margin:0 8px;
+  }
+  header.hero p{
+    color:var(--ink-dim); font-size:15px; max-width:640px; margin:0;
+  }
+  .legend{display:flex; gap:22px; margin-top:22px;}
+  .legend .chip{
+    display:flex; align-items:center; gap:8px; font-size:12.5px; font-weight:600; color:var(--ink-dim);
+  }
+  .legend .swatch{width:10px; height:10px; border-radius:3px;}
+
+  section.topic{
+    margin-bottom:64px; padding-top:12px;
+    border-top:1px solid var(--hair);
+  }
+  section.topic h2{
+    font-size:22px; font-weight:700; margin:24px 0 6px; letter-spacing:-.01em;
+  }
+  section.topic .blurb{
+    color:var(--ink-dim); font-size:14px; max-width:680px; margin:0 0 22px;
+  }
+
+  .compare{
+    display:grid; grid-template-columns:1fr 1fr; gap:18px;
+  }
+  @media (max-width: 880px){ .compare{grid-template-columns:1fr;} }
+
+  .code-card{
+    background:var(--panel); border:1px solid var(--hair); border-radius:10px;
+    overflow:hidden;
+  }
+  .code-card .cc-head{
+    display:flex; align-items:center; gap:9px;
+    padding:11px 16px; font-size:12.5px; font-weight:700;
+    border-bottom:1px solid var(--hair);
+  }
+  .code-card.java .cc-head{color:var(--java); background:linear-gradient(180deg, var(--java-dim), transparent);}
+  .code-card.dotnet .cc-head{color:var(--dotnet); background:linear-gradient(180deg, var(--dotnet-dim), transparent);}
+  .code-card .cc-head .tag{
+    font-size:10.5px; font-weight:600; color:var(--ink-dim); margin-left:auto;
+  }
+  .code-card pre{margin:0; padding:16px; overflow-x:auto; font-size:12.6px;}
+  .code-card code.hljs{background:transparent; padding:0;}
+
+  .note{
+    margin-top:14px; font-size:13px; color:var(--ink-dim);
+    background:var(--panel); border:1px solid var(--hair); border-left:3px solid var(--java);
+    padding:11px 14px; border-radius:6px;
+  }
+  .note b{color:var(--ink); font-weight:600;}
+
+  table.matrix{
+    width:100%; border-collapse:collapse; font-size:13.2px; margin-top:8px;
+  }
+  table.matrix th, table.matrix td{
+    text-align:left; padding:10px 14px; border-bottom:1px solid var(--hair);
+    vertical-align:top;
+  }
+  table.matrix th{
+    color:var(--ink-dim); font-weight:600; font-size:11.5px;
+  }
+  table.matrix td.j{color:var(--java);}
+  table.matrix td.n{color:var(--dotnet);}
+  table.matrix code{font-size:12px; color:var(--ink);}
+  table.matrix tr:last-child td{border-bottom:none;}
+
+  footer{
+    margin-left:var(--sidebar-w); padding:28px 48px 60px;
+    color:var(--ink-dim); font-size:12.5px; border-top:1px solid var(--hair);
+  }
+
+  @media (max-width: 720px){
+    .sidebar{display:none;}
+    .main, footer{margin-left:0; padding-left:24px; padding-right:24px;}
+  }
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <p class="brand">ORM<span>Relations</span></p>
+  <p class="brand-sub">Spring Boot JPA vs ASP.NET Core EF</p>
+  <nav>
+    <p class="nav-group-label">Guide</p>
+    <a href="#overview"><span class="dot"></span>Overview</a>
+    <p class="nav-group-label">Relationships</p>
+    <a href="#one-to-one"><span class="dot"></span>One-to-One</a>
+    <a href="#many-to-one"><span class="dot"></span>Many-to-One / One-to-Many</a>
+    <a href="#many-to-many"><span class="dot"></span>Many-to-Many</a>
+    <p class="nav-group-label">Raw SQL</p>
+    <a href="#sql-joins"><span class="dot"></span>SQL Joins</a>
+    <p class="nav-group-label">Column control</p>
+    <a href="#foreign-keys"><span class="dot"></span>Foreign Key Annotations</a>
+    <a href="#cascade"><span class="dot"></span>Cascade &amp; Delete Behavior</a>
+    <a href="#fetching"><span class="dot"></span>Lazy vs Eager Loading</a>
+    <p class="nav-group-label">Reference</p>
+    <a href="#full-example"><span class="dot"></span>Full Entity Example</a>
+    <a href="#cheatsheet"><span class="dot"></span>Annotation Cheatsheet</a>
+  </nav>
+</aside>
+
+<main class="main">
+
+  <header class="hero" id="overview">
+    <h1>JPA <span class="vs">vs</span> EF Core</h1>
+    <p>Side-by-side relationship mapping code for the current LTS lines: <b style="color:var(--ink)">Spring Boot 3.x</b> (Jakarta Persistence 3.1, Hibernate) against <b style="color:var(--ink)">ASP.NET Core 8/9</b> (EF Core 8/9). Same five relationship shapes, shown in both frameworks' native idiom — annotations on the Java side, a mix of data annotations and Fluent API on the .NET side.</p>
+    <div class="legend">
+      <div class="chip"><span class="swatch" style="background:var(--java)"></span>Spring Boot / JPA</div>
+      <div class="chip"><span class="swatch" style="background:var(--dotnet)"></span>ASP.NET Core / EF Core</div>
+    </div>
+  </header>
+
+  <section class="topic" id="one-to-one">
+    <h2>One-to-One</h2>
+    <p class="blurb">A profile that belongs to exactly one user. JPA puts the owning side's foreign key on whichever entity has <code>@JoinColumn</code>; EF Core infers the same thing from which class holds the dependent's key, or you can state it explicitly with Fluent API.</p>
+    <div class="compare">
+      <div class="code-card java">
+        <div class="cc-head">Spring Boot — JPA<span class="tag">User.java / Profile.java</span></div>
+        <pre><code class="language-java">@Entity
+public class User {
+    @Id @GeneratedValue
+    private Long id;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private Profile profile;
+}
+
+@Entity
+public class Profile {
+    @Id @GeneratedValue
+    private Long id;
+
+    private String bio;
+
+    @OneToOne
+    @JoinColumn(name = "user_id") // owning side, FK column
+    private User user;
+}</code></pre>
+      </div>
+      <div class="code-card dotnet">
+        <div class="cc-head">ASP.NET Core — EF Core<span class="tag">User.cs / Profile.cs</span></div>
+        <pre><code class="language-csharp">public class User
+{
+    public int Id { get; set; }
+    public Profile? Profile { get; set; }
+}
+
+public class Profile
+{
+    public int Id { get; set; }
+    public string Bio { get; set; } = "";
+
+    public int UserId { get; set; }   // FK by convention
+    public User User { get; set; } = null!;
+}
+
+// OnModelCreating (Fluent API, optional if
+// naming convention "UserId" is followed)
+modelBuilder.Entity&lt;Profile&gt;()
+    .HasOne(p => p.User)
+    .WithOne(u => u.Profile)
+    .HasForeignKey&lt;Profile&gt;(p => p.UserId);</code></pre>
+      </div>
+    </div>
+    <div class="note"><b>Key difference:</b> JPA needs <code>mappedBy</code> on the inverse side to say "I don't own the FK, look at the other field." EF Core has no <code>mappedBy</code> equivalent — direction is resolved by which entity has the FK property, and Fluent API's <code>HasOne().WithOne()</code> chain is only needed when the convention can't guess it.</div>
+  </section>
+
+  <section class="topic" id="many-to-one">
+    <h2>Many-to-One / One-to-Many</h2>
+    <p class="blurb">Many orders belong to one customer. In JPA this is two annotated sides of the same relationship. In EF Core it's just two navigation properties — no attribute is required at all if you follow naming conventions.</p>
+    <div class="compare">
+      <div class="code-card java">
+        <div class="cc-head">Spring Boot — JPA<span class="tag">Customer.java / Order.java</span></div>
+        <pre><code class="language-java">@Entity
+public class Customer {
+    @Id @GeneratedValue
+    private Long id;
+
+    @OneToMany(mappedBy = "customer",
+               cascade = CascadeType.ALL,
+               orphanRemoval = true)
+    private List&lt;Order&gt; orders = new ArrayList&lt;&gt;();
+}
+
+@Entity
+public class Order {
+    @Id @GeneratedValue
+    private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "customer_id", nullable = false)
+    private Customer customer;
+}</code></pre>
+      </div>
+      <div class="code-card dotnet">
+        <div class="cc-head">ASP.NET Core — EF Core<span class="tag">Customer.cs / Order.cs</span></div>
+        <pre><code class="language-csharp">public class Customer
+{
+    public int Id { get; set; }
+    public List&lt;Order&gt; Orders { get; set; } = new();
+}
+
+public class Order
+{
+    public int Id { get; set; }
+
+    public int CustomerId { get; set; }   // FK by convention
+    public Customer Customer { get; set; } = null!;
+}
+
+// Only needed to customize (delete behavior etc.)
+modelBuilder.Entity&lt;Order&gt;()
+    .HasOne(o => o.Customer)
+    .WithMany(c => c.Orders)
+    .HasForeignKey(o => o.CustomerId)
+    .OnDelete(DeleteBehavior.Cascade);</code></pre>
+      </div>
+    </div>
+    <div class="note"><b>Key difference:</b> JPA's <code>@ManyToOne</code> / <code>@OneToMany</code> pair is mandatory annotation on both classes. EF Core's convention-based mapping means a plain collection + FK property on the "many" side is often enough — Fluent API only kicks in when you need to override something (delete behavior, a non-standard FK name, a required relationship).</div>
+  </section>
+
+  <section class="topic" id="many-to-many">
+    <h2>Many-to-Many</h2>
+    <p class="blurb">Students enrolled in courses. JPA can map a plain join table directly with <code>@ManyToMany</code>. EF Core 5+ can do the same with a "skip navigation," or you can drop down to an explicit join entity when the join table needs extra columns (like <code>EnrolledOn</code>).</p>
+    <div class="compare">
+      <div class="code-card java">
+        <div class="cc-head">Spring Boot — JPA<span class="tag">Student.java / Course.java</span></div>
+        <pre><code class="language-java">@Entity
+public class Student {
+    @Id @GeneratedValue
+    private Long id;
+
+    @ManyToMany
+    @JoinTable(
+        name = "student_course",
+        joinColumns = @JoinColumn(name = "student_id"),
+        inverseJoinColumns = @JoinColumn(name = "course_id")
+    )
+    private Set&lt;Course&gt; courses = new HashSet&lt;&gt;();
+}
+
+@Entity
+public class Course {
+    @Id @GeneratedValue
+    private Long id;
+
+    @ManyToMany(mappedBy = "courses")
+    private Set&lt;Student&gt; students = new HashSet&lt;&gt;();
+}</code></pre>
+      </div>
+      <div class="code-card dotnet">
+        <div class="cc-head">ASP.NET Core — EF Core<span class="tag">Student.cs / Course.cs</span></div>
+        <pre><code class="language-csharp">public class Student
+{
+    public int Id { get; set; }
+    public List&lt;Course&gt; Courses { get; set; } = new();
+}
+
+public class Course
+{
+    public int Id { get; set; }
+    public List&lt;Student&gt; Students { get; set; } = new();
+}
+
+// Convention alone creates a hidden join table
+// "CourseStudent". To name it explicitly:
+modelBuilder.Entity&lt;Student&gt;()
+    .HasMany(s => s.Courses)
+    .WithMany(c => c.Students)
+    .UsingEntity(j => j.ToTable("student_course"));</code></pre>
+      </div>
+    </div>
+    <div class="note"><b>Key difference:</b> JPA always needs <code>@JoinTable</code> spelled out on the owning side. EF Core can generate the join table silently from two list navigation properties alone — <code>UsingEntity</code> is optional, only needed to rename the table or add payload columns to it.</div>
+  </section>
+
+  <section class="topic" id="sql-joins">
+    <h2>SQL Joins</h2>
+    <p class="blurb">This is what both frameworks generate under the hood when you actually fetch related rows. Same <code>customer</code> / <code>order</code> tables as the Many-to-One example above: every customer has zero or more orders, and every order belongs to exactly one customer.</p>
+
+    <div class="code-card java" style="margin-bottom:18px;">
+      <div class="cc-head" style="color:var(--ink)">INNER JOIN<span class="tag">only rows that match on both sides</span></div>
+      <pre><code class="language-sql">SELECT c.name, o.id AS order_id, o.total
+FROM customer c
+INNER JOIN "order" o ON o.customer_id = c.id;
+
+-- Customers with no orders are excluded.
+-- Orders with a dangling customer_id are excluded.</code></pre>
+    </div>
+
+    <div class="code-card java" style="margin-bottom:18px;">
+      <div class="cc-head" style="color:var(--ink)">LEFT JOIN <span class="mono" style="font-weight:400;color:var(--ink-dim)">(LEFT OUTER JOIN)</span><span class="tag">everything on the left, matched or not</span></div>
+      <pre><code class="language-sql">SELECT c.name, o.id AS order_id, o.total
+FROM customer c
+LEFT JOIN "order" o ON o.customer_id = c.id;
+
+-- Every customer appears at least once,
+-- even ones with zero orders (order_id/total = NULL).</code></pre>
+    </div>
+
+    <div class="code-card java" style="margin-bottom:18px;">
+      <div class="cc-head" style="color:var(--ink)">RIGHT JOIN <span class="mono" style="font-weight:400;color:var(--ink-dim)">(RIGHT OUTER JOIN)</span><span class="tag">everything on the right, matched or not</span></div>
+      <pre><code class="language-sql">SELECT c.name, o.id AS order_id, o.total
+FROM customer c
+RIGHT JOIN "order" o ON o.customer_id = c.id;
+
+-- Every order appears, even ones whose customer_id
+-- is NULL or doesn't match any customer (name = NULL).
+-- Rare in practice: usually rewritten as a LEFT JOIN
+-- with the tables swapped, since it reads more naturally.</code></pre>
+    </div>
+
+    <div class="code-card java" style="margin-bottom:6px;">
+      <div class="cc-head" style="color:var(--ink)">FULL OUTER JOIN<span class="tag">everything from both sides</span></div>
+      <pre><code class="language-sql">SELECT c.name, o.id AS order_id, o.total
+FROM customer c
+FULL OUTER JOIN "order" o ON o.customer_id = c.id;
+
+-- Unmatched customers AND unmatched orders both show up,
+-- with NULLs filling in the missing side.
+
+-- MySQL has no FULL OUTER JOIN keyword — emulate it:
+SELECT c.name, o.id AS order_id, o.total
+FROM customer c LEFT JOIN "order" o ON o.customer_id = c.id
+UNION
+SELECT c.name, o.id AS order_id, o.total
+FROM customer c RIGHT JOIN "order" o ON o.customer_id = c.id;</code></pre>
+    </div>
+
+    <div class="note"><b>How each ORM gets here:</b> in JPA/Hibernate, a plain <code>customer.getOrders()</code> triggers a second lazy-load query, but a JPQL <code>JOIN FETCH o.orders</code> (or a Spring Data <code>@EntityGraph</code>) collapses it into one query — an <code>INNER JOIN</code> by default, or <code>LEFT JOIN FETCH</code> to include customers with no orders. In EF Core, <code>.Include(c => c.Orders)</code> compiles to a <code>LEFT JOIN</code> so parents with no children are still returned. Neither ORM generates a <code>RIGHT JOIN</code> or <code>FULL OUTER JOIN</code> on its own — those you write as raw SQL (<code>@Query</code> / <code>createNativeQuery</code> in Spring, <code>FromSqlRaw</code> in EF Core) when you genuinely need them.</div>
+  </section>
+
+  <section class="topic" id="foreign-keys">
+    <h2>Foreign Key Annotations</h2>
+    <p class="blurb">Both frameworks let you pin down the exact FK column name, nullability, and which side is authoritative.</p>
+    <table class="matrix">
+      <tr><th>Purpose</th><th>Spring Boot (JPA)</th><th>ASP.NET Core (EF Core)</th></tr>
+      <tr><td>Name the FK column</td><td class="j"><code>@JoinColumn(name = "customer_id")</code></td><td class="n"><code>[ForeignKey("CustomerId")]</code> or Fluent <code>HasForeignKey()</code></td></tr>
+      <tr><td>Mark the non-owning side</td><td class="j"><code>mappedBy = "fieldName"</code></td><td class="n">Inferred, or Fluent <code>.WithOne(x =&gt; x.Nav)</code></td></tr>
+      <tr><td>Require the relationship</td><td class="j"><code>@JoinColumn(nullable = false)</code></td><td class="n">Non-nullable FK property, or <code>.IsRequired()</code></td></tr>
+      <tr><td>Composite / custom naming</td><td class="j"><code>@JoinColumns({...})</code></td><td class="n">Fluent <code>.HasForeignKey(e =&gt; new { e.A, e.B })</code></td></tr>
+      <tr><td>Alternate key (non-PK target)</td><td class="j"><code>referencedColumnName = "code"</code></td><td class="n">Fluent <code>.HasPrincipalKey(x =&gt; x.Code)</code></td></tr>
+      <tr><td>Join table for M:M</td><td class="j"><code>@JoinTable(...)</code></td><td class="n">Fluent <code>.UsingEntity(...)</code></td></tr>
+    </table>
+    <div class="note"><b>Key difference:</b> JPA's FK configuration lives almost entirely in annotations on the entity class itself. EF Core supports a similar attribute, <code>[ForeignKey]</code>, but idiomatic EF Core pushes most of this into the <code>OnModelCreating</code> Fluent API instead — keeping entity classes as plain POCOs with no persistence-framework attributes on them at all, which is a deliberate style difference between the two ecosystems, not just a syntax one.</div>
+  </section>
+
+  <section class="topic" id="cascade">
+    <h2>Cascade &amp; Delete Behavior</h2>
+    <div class="compare">
+      <div class="code-card java">
+        <div class="cc-head">Spring Boot — JPA<span class="tag">cascade types</span></div>
+        <pre><code class="language-java">@OneToMany(mappedBy = "customer",
+           cascade = CascadeType.ALL,
+           orphanRemoval = true)
+private List&lt;Order&gt; orders;
+
+// CascadeType: PERSIST, MERGE, REMOVE,
+// REFRESH, DETACH, ALL
+// orphanRemoval: delete child when
+// unlinked from the parent collection</code></pre>
+      </div>
+      <div class="code-card dotnet">
+        <div class="cc-head">ASP.NET Core — EF Core<span class="tag">delete behavior</span></div>
+        <pre><code class="language-csharp">modelBuilder.Entity&lt;Order&gt;()
+    .HasOne(o => o.Customer)
+    .WithMany(c => c.Orders)
+    .OnDelete(DeleteBehavior.Cascade);
+
+// DeleteBehavior: Cascade, Restrict,
+// SetNull, NoAction, ClientSetNull
+// Required nav + collection = cascade
+// by convention already</code></pre>
+      </div>
+    </div>
+    <div class="note"><b>Key difference:</b> JPA cascade covers the full persistence lifecycle (save, merge, delete, refresh, detach) at the application/ORM level. EF Core's <code>DeleteBehavior</code> is narrower and maps closer to what happens at the database (or SaveChanges time) on delete specifically — save/insert cascading in EF Core is just a side effect of the change tracker, not a separate setting you configure.</div>
+  </section>
+
+  <section class="topic" id="fetching">
+    <h2>Lazy vs Eager Loading</h2>
+    <div class="compare">
+      <div class="code-card java">
+        <div class="cc-head">Spring Boot — JPA<span class="tag">fetch types</span></div>
+        <pre><code class="language-java">@ManyToOne(fetch = FetchType.LAZY)
+private Customer customer;
+
+@OneToMany(fetch = FetchType.EAGER)
+private List&lt;Order&gt; orders;
+
+// Defaults: @ManyToOne/@OneToOne = EAGER
+//           @OneToMany/@ManyToMany = LAZY</code></pre>
+      </div>
+      <div class="code-card dotnet">
+        <div class="cc-head">ASP.NET Core — EF Core<span class="tag">loading strategies</span></div>
+        <pre><code class="language-csharp">// Eager: explicit, per-query
+var orders = db.Orders
+    .Include(o => o.Customer)
+    .ToList();
+
+// Lazy: needs virtual nav +
+// Microsoft.EntityFrameworkCore.Proxies
+public virtual Customer Customer { get; set; }
+options.UseLazyLoadingProxies();
+
+// Default with no Include(): not loaded at all</code></pre>
+      </div>
+    </div>
+    <div class="note"><b>Key difference:</b> JPA has built-in lazy loading as a first-class default. EF Core is eager-or-explicit by default (a navigation property is simply <code>null</code> until you <code>.Include()</code> it), and true lazy loading is an opt-in add-on package rather than a core feature — a deliberate EF Core design choice to avoid surprise N+1 queries.</div>
+  </section>
+
+  <section class="topic" id="full-example">
+    <h2>Full Entity Example</h2>
+    <p class="blurb">A <code>Blog</code> with many <code>Post</code>s, each post with many <code>Tag</code>s via a join table — every relationship type in one place.</p>
+    <div class="compare">
+      <div class="code-card java">
+        <div class="cc-head">Spring Boot — JPA<span class="tag">Blog / Post / Tag</span></div>
+        <pre><code class="language-java">@Entity
+public class Blog {
+    @Id @GeneratedValue private Long id;
+    private String name;
+
+    @OneToMany(mappedBy = "blog", cascade = CascadeType.ALL,
+               orphanRemoval = true, fetch = FetchType.LAZY)
+    private List&lt;Post&gt; posts = new ArrayList&lt;&gt;();
+}
+
+@Entity
+public class Post {
+    @Id @GeneratedValue private Long id;
+    private String title;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "blog_id", nullable = false)
+    private Blog blog;
+
+    @ManyToMany
+    @JoinTable(name = "post_tag",
+        joinColumns = @JoinColumn(name = "post_id"),
+        inverseJoinColumns = @JoinColumn(name = "tag_id"))
+    private Set&lt;Tag&gt; tags = new HashSet&lt;&gt;();
+}
+
+@Entity
+public class Tag {
+    @Id @GeneratedValue private Long id;
+    private String label;
+
+    @ManyToMany(mappedBy = "tags")
+    private Set&lt;Post&gt; posts = new HashSet&lt;&gt;();
+}</code></pre>
+      </div>
+      <div class="code-card dotnet">
+        <div class="cc-head">ASP.NET Core — EF Core<span class="tag">Blog / Post / Tag</span></div>
+        <pre><code class="language-csharp">public class Blog
+{
+    public int Id { get; set; }
+    public string Name { get; set; } = "";
+    public List&lt;Post&gt; Posts { get; set; } = new();
+}
+
+public class Post
+{
+    public int Id { get; set; }
+    public string Title { get; set; } = "";
+
+    public int BlogId { get; set; }
+    public Blog Blog { get; set; } = null!;
+
+    public List&lt;Tag&gt; Tags { get; set; } = new();
+}
+
+public class Tag
+{
+    public int Id { get; set; }
+    public string Label { get; set; } = "";
+    public List&lt;Post&gt; Posts { get; set; } = new();
+}
+
+// OnModelCreating
+modelBuilder.Entity&lt;Post&gt;()
+    .HasOne(p => p.Blog).WithMany(b => b.Posts)
+    .HasForeignKey(p => p.BlogId)
+    .OnDelete(DeleteBehavior.Cascade);
+
+modelBuilder.Entity&lt;Post&gt;()
+    .HasMany(p => p.Tags).WithMany(t => t.Posts)
+    .UsingEntity(j => j.ToTable("post_tag"));</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <section class="topic" id="cheatsheet">
+    <h2>Annotation Cheatsheet</h2>
+    <table class="matrix">
+      <tr><th>Concept</th><th>JPA (Spring Boot)</th><th>EF Core (ASP.NET Core)</th></tr>
+      <tr><td>Mark a class as an entity</td><td class="j"><code>@Entity</code></td><td class="n">Included in a <code>DbSet&lt;T&gt;</code></td></tr>
+      <tr><td>Primary key</td><td class="j"><code>@Id</code></td><td class="n"><code>[Key]</code> or property named <code>Id</code>/<code>&lt;Class&gt;Id</code></td></tr>
+      <tr><td>Auto-increment</td><td class="j"><code>@GeneratedValue</code></td><td class="n">Convention on <code>int</code>/<code>Guid</code> keys, or <code>.ValueGeneratedOnAdd()</code></td></tr>
+      <tr><td>One-to-one</td><td class="j"><code>@OneToOne</code></td><td class="n"><code>HasOne().WithOne()</code></td></tr>
+      <tr><td>Many-to-one</td><td class="j"><code>@ManyToOne</code></td><td class="n"><code>HasOne().WithMany()</code></td></tr>
+      <tr><td>One-to-many</td><td class="j"><code>@OneToMany</code></td><td class="n"><code>HasMany().WithOne()</code></td></tr>
+      <tr><td>Many-to-many</td><td class="j"><code>@ManyToMany</code></td><td class="n"><code>HasMany().WithMany()</code></td></tr>
+      <tr><td>Foreign key column</td><td class="j"><code>@JoinColumn</code></td><td class="n"><code>[ForeignKey]</code> / <code>.HasForeignKey()</code></td></tr>
+      <tr><td>Join table (M:M)</td><td class="j"><code>@JoinTable</code></td><td class="n"><code>.UsingEntity()</code></td></tr>
+      <tr><td>Inverse (non-owning) side</td><td class="j"><code>mappedBy</code></td><td class="n">Second nav property in the chain</td></tr>
+      <tr><td>Cascade delete</td><td class="j"><code>cascade = CascadeType.REMOVE</code></td><td class="n"><code>.OnDelete(DeleteBehavior.Cascade)</code></td></tr>
+      <tr><td>Lazy loading</td><td class="j">Default for collections</td><td class="n">Opt-in via <code>UseLazyLoadingProxies()</code></td></tr>
+      <tr><td>Column customization</td><td class="j"><code>@Column(name, nullable, length)</code></td><td class="n"><code>[Column]</code> / <code>.Property().HasColumnName()</code></td></tr>
+    </table>
+  </section>
+
+</main>
+
+<footer>
+  Reference doc — Spring Boot 3.x (Jakarta Persistence 3.1) and ASP.NET Core 8/9 (EF Core 8/9). Annotation names and Fluent API surface can shift slightly between minor versions — check the current docs for anything version-sensitive before shipping.
+</footer>
+
+<script>
+  hljs.highlightAll();
+
+  // Active nav link on scroll
+  const links = document.querySelectorAll('.sidebar nav a');
+  const sections = Array.from(links).map(a => document.querySelector(a.getAttribute('href')));
+  const setActive = () => {
+    let idx = 0;
+    const y = window.scrollY + 120;
+    sections.forEach((sec, i) => { if (sec && sec.offsetTop <= y) idx = i; });
+    links.forEach((a, i) => a.classList.toggle('active', i === idx));
+  };
+  document.addEventListener('scroll', setActive, { passive: true });
+  window.addEventListener('load', setActive);
+</script>
+
+</body>
+</html>
