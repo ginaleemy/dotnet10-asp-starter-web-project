@@ -1,0 +1,1600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ASP.NET Core vs Spring Boot — Comparison</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --panel: #171a23;
+    --panel-2: #1d2130;
+    --border: #2a2f3f;
+    --text: #e6e8f0;
+    --muted: #9aa0b4;
+    --accent: #7c9eff;
+    --accent-2: #ff9d7c;
+    --code-bg: #11131b;
+    --green: #6fd08c;
+    --purple: #c792ea;
+    --legacy: #f2a65a;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+  }
+  header {
+    padding: 48px 24px 32px;
+    text-align: center;
+    background: linear-gradient(180deg, #1a1e2b 0%, var(--bg) 100%);
+    border-bottom: 1px solid var(--border);
+  }
+  header h1 {
+    margin: 0 0 8px;
+    font-size: 2rem;
+    letter-spacing: -0.02em;
+  }
+  header h1 span.dotnet { color: var(--accent); }
+  header h1 span.spring { color: var(--accent-2); }
+  header p {
+    color: var(--muted);
+    margin: 0;
+    font-size: 1rem;
+  }
+  main {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 32px 20px 80px;
+  }
+  section {
+    margin-bottom: 48px;
+  }
+  h2 {
+    font-size: 1.4rem;
+    border-left: 4px solid var(--accent);
+    padding-left: 12px;
+    margin-bottom: 16px;
+  }
+  h3 {
+    font-size: 1.1rem;
+    color: var(--accent);
+    margin-top: 28px;
+    margin-bottom: 10px;
+  }
+  p { color: var(--text); }
+  .muted { color: var(--muted); }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--panel);
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  th, td {
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    font-size: 0.95rem;
+  }
+  th {
+    background: var(--panel-2);
+    color: var(--accent);
+    font-weight: 600;
+  }
+  tr:last-child td { border-bottom: none; }
+  td.dotnet-col { border-left: 3px solid var(--accent); }
+  td.spring-col { border-left: 3px solid var(--accent-2); }
+  td.legacy-col { border-left: 3px solid var(--legacy); }
+  td.modern-col { border-left: 3px solid var(--accent); }
+
+  .code-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 16px 0;
+  }
+  @media (max-width: 800px) {
+    .code-grid { grid-template-columns: 1fr; }
+  }
+  .code-block {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .code-block .label {
+    padding: 8px 14px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .code-block.dotnet .label { background: rgba(124,158,255,0.12); color: var(--accent); }
+  .code-block.spring .label { background: rgba(255,157,124,0.12); color: var(--accent-2); }
+  .code-block.legacy .label { background: rgba(242,166,90,0.12); color: var(--legacy); }
+  .code-block.modern .label { background: rgba(124,158,255,0.12); color: var(--accent); }
+  pre {
+    margin: 0;
+    padding: 16px;
+    overflow-x: auto;
+    font-size: 0.85rem;
+  }
+  code {
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  }
+  .kw { color: var(--purple); }
+  .str { color: var(--green); }
+  .cmt { color: var(--muted); font-style: italic; }
+  .type { color: var(--accent); }
+
+  .callout {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--accent-2);
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin: 18px 0;
+    font-size: 0.95rem;
+  }
+  .callout strong { color: var(--accent-2); }
+
+  .badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-right: 6px;
+  }
+  .badge.dotnet { background: rgba(124,158,255,0.15); color: var(--accent); }
+  .badge.spring { background: rgba(255,157,124,0.15); color: var(--accent-2); }
+  .badge.legacy { background: rgba(242,166,90,0.15); color: var(--legacy); }
+  .badge.modern { background: rgba(124,158,255,0.15); color: var(--accent); }
+
+  footer {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.85rem;
+    padding: 24px;
+    border-top: 1px solid var(--border);
+  }
+
+  ul { padding-left: 20px; }
+  li { margin-bottom: 6px; }
+
+  /* Sidebar layout */
+  body { display: flex; align-items: flex-start; }
+  .sidebar {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    width: 260px;
+    flex-shrink: 0;
+    background: var(--panel);
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
+    padding: 20px 0 40px;
+  }
+  .sidebar .brand {
+    padding: 0 20px 16px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--text);
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 12px;
+  }
+  .sidebar .brand span.dotnet { color: var(--accent); }
+  .sidebar .brand span.spring { color: var(--accent-2); }
+  .sidebar nav a {
+    display: block;
+    padding: 8px 20px;
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.88rem;
+    border-left: 3px solid transparent;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+  }
+  .sidebar nav a:hover {
+    background: var(--panel-2);
+    color: var(--text);
+  }
+  .sidebar nav a.active {
+    background: var(--panel-2);
+    color: var(--accent);
+    border-left-color: var(--accent);
+  }
+  .sidebar .group-label {
+    padding: 14px 20px 4px;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+  }
+  .page-body {
+    flex: 1;
+    min-width: 0;
+  }
+  .sidebar-toggle {
+    display: none;
+  }
+  @media (max-width: 900px) {
+    body { flex-direction: column; }
+    .sidebar {
+      position: relative;
+      height: auto;
+      width: 100%;
+      top: 0;
+      border-right: none;
+      border-bottom: 1px solid var(--border);
+    }
+    .sidebar nav { display: none; }
+    .sidebar.open nav { display: block; }
+    .sidebar-toggle {
+      display: block;
+      width: 100%;
+      text-align: left;
+      background: none;
+      border: none;
+      color: var(--text);
+      font-size: 0.95rem;
+      font-weight: 700;
+      padding: 4px 20px 16px;
+      cursor: pointer;
+    }
+    .sidebar-toggle::after {
+      content: " \25BE";
+      color: var(--muted);
+    }
+  }
+</style>
+</head>
+<body>
+
+<aside class="sidebar" id="sidebar">
+  <div class="brand"><span class="dotnet">ASP.NET Core</span> vs <span class="spring">Spring Boot</span></div>
+  <button class="sidebar-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">Jump to section</button>
+  <nav>
+    <div class="group-label">Fundamentals</div>
+    <a href="#overview">1. Overview</a>
+    <a href="#startup">2. Startup &amp; Project Structure</a>
+    <a href="#endpoint">3. API Endpoint</a>
+    <a href="#async">4. Async Handling</a>
+    <a href="#di">5. Dependency Injection</a>
+    <div class="group-label">Layered Design</div>
+    <a href="#controller-design">6. Controller Design</a>
+    <a href="#service-design">7. Service Layer Design</a>
+    <a href="#db-design">8. Database / Entity Design</a>
+    <a href="#dto-design">9. DTO Design &amp; Mapping</a>
+    <a href="#validation-design">10. Validation Design</a>
+    <a href="#config-design">11. Configuration Design</a>
+    <div class="group-label">Beyond the Basics</div>
+    <a href="#legacy-vs-modern">12. Legacy .NET vs Modern .NET</a>
+    <a href="#build-tooling">13. Build Process &amp; Tooling</a>
+    <a href="#syntax-cheatsheet">14. Common Syntax Cheat Sheet</a>
+    <a href="#ef-jpa-methods">15. EF Core vs JPA Methods</a>
+    <a href="#summary">16. Quick Summary</a>
+  </nav>
+</aside>
+
+<div class="page-body">
+
+<header>
+  <h1><span class="dotnet">ASP.NET Core</span> vs <span class="spring">Spring Boot</span></h1>
+  <p>Architecture, async model, controllers, services, DB design, DTOs, validation, and configuration — side by side</p>
+</header>
+
+<main>
+
+<section id="overview">
+  <h2>1. Overview</h2>
+  <table>
+    <tr><th>Aspect</th><th class="dotnet-col">ASP.NET Core</th><th class="spring-col">Spring Boot</th></tr>
+    <tr><td>Language</td><td class="dotnet-col">C# (also F#, VB.NET)</td><td class="spring-col">Java (also Kotlin, Groovy)</td></tr>
+    <tr><td>Runtime</td><td class="dotnet-col">.NET (CLR)</td><td class="spring-col">JVM</td></tr>
+    <tr><td>Creator</td><td class="dotnet-col">Microsoft</td><td class="spring-col">Pivotal / VMware (Spring team)</td></tr>
+    <tr><td>DI Container</td><td class="dotnet-col">Built-in (Microsoft.Extensions.DependencyInjection)</td><td class="spring-col">Built-in (Spring IoC container)</td></tr>
+    <tr><td>Config style</td><td class="dotnet-col">appsettings.json, Options pattern</td><td class="spring-col">application.properties / application.yml</td></tr>
+    <tr><td>Build tool</td><td class="dotnet-col">MSBuild / dotnet CLI</td><td class="spring-col">Maven / Gradle</td></tr>
+    <tr><td>Default web server</td><td class="dotnet-col">Kestrel</td><td class="spring-col">Embedded Tomcat (or Jetty/Undertow)</td></tr>
+    <tr><td>ORM</td><td class="dotnet-col">Entity Framework Core</td><td class="spring-col">Spring Data JPA (Hibernate)</td></tr>
+    <tr><td>Hosting model</td><td class="dotnet-col">Self-contained or framework-dependent, cross-platform</td><td class="spring-col">Runs anywhere a JVM exists</td></tr>
+  </table>
+</section>
+
+<section id="startup">
+  <h2>2. Project Structure &amp; Startup</h2>
+  <div class="code-grid">
+    <div class="code-block dotnet">
+      <div class="label">ASP.NET Core — Program.cs</div>
+      <pre><code><span class="kw">var</span> builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddControllers();
+builder.Services.AddScoped&lt;<span class="type">IOrderService</span>, <span class="type">OrderService</span>&gt;();
+builder.Services.AddDbContext&lt;<span class="type">AppDbContext</span>&gt;(opt =&gt;
+    opt.UseSqlServer(builder.Configuration.GetConnectionString(<span class="str">"Default"</span>)));
+
+<span class="kw">var</span> app = builder.Build();
+
+app.MapControllers();
+app.Run();</code></pre>
+    </div>
+    <div class="code-block spring">
+      <div class="label">Spring Boot — Application.java</div>
+      <pre><code><span class="kw">@SpringBootApplication</span>
+<span class="kw">public class</span> <span class="type">OrderApplication</span> {
+    <span class="kw">public static void</span> main(<span class="type">String</span>[] args) {
+        SpringApplication.run(OrderApplication.<span class="kw">class</span>, args);
+    }
+}
+
+<span class="cmt">// application.yml handles DB config;
+// @Service / @Repository beans are auto-detected</span></code></pre>
+    </div>
+  </div>
+  <div class="callout">
+    <strong>Key difference:</strong> ASP.NET Core wires services explicitly in <code>Program.cs</code> (minimal hosting model). Spring Boot leans on classpath scanning and annotations (<code>@Component</code>, <code>@Service</code>, <code>@Repository</code>) so beans are discovered automatically — less boilerplate, but more "magic" to trace.
+  </div>
+</section>
+
+<section id="endpoint">
+  <h2>3. Defining an API Endpoint</h2>
+  <div class="code-grid">
+    <div class="code-block dotnet">
+      <div class="label">ASP.NET Core — Controller</div>
+      <pre><code>[<span class="type">ApiController</span>]
+[<span class="type">Route</span>(<span class="str">"api/[controller]"</span>)]
+<span class="kw">public class</span> <span class="type">OrdersController</span> : <span class="type">ControllerBase</span>
+{
+    <span class="kw">private readonly</span> <span class="type">IOrderService</span> _service;
+
+    <span class="kw">public</span> OrdersController(<span class="type">IOrderService</span> service)
+        =&gt; _service = service;
+
+    [<span class="type">HttpGet</span>(<span class="str">"{id}"</span>)]
+    <span class="kw">public async</span> <span class="type">Task</span>&lt;<span class="type">IActionResult</span>&gt; GetById(<span class="type">int</span> id)
+    {
+        <span class="kw">var</span> order = <span class="kw">await</span> _service.GetByIdAsync(id);
+        <span class="kw">return</span> order <span class="kw">is null</span> ? NotFound() : Ok(order);
+    }
+}</code></pre>
+    </div>
+    <div class="code-block spring">
+      <div class="label">Spring Boot — Controller</div>
+      <pre><code><span class="kw">@RestController</span>
+<span class="kw">@RequestMapping</span>(<span class="str">"/api/orders"</span>)
+<span class="kw">public class</span> <span class="type">OrderController</span> {
+
+    <span class="kw">private final</span> <span class="type">OrderService</span> service;
+
+    <span class="kw">public</span> OrderController(<span class="type">OrderService</span> service) {
+        <span class="kw">this</span>.service = service;
+    }
+
+    <span class="kw">@GetMapping</span>(<span class="str">"/{id}"</span>)
+    <span class="kw">public</span> <span class="type">ResponseEntity</span>&lt;<span class="type">Order</span>&gt; getById(<span class="kw">@PathVariable</span> <span class="type">Long</span> id) {
+        <span class="kw">return</span> service.findById(id)
+            .map(ResponseEntity::ok)
+            .orElseGet(() -&gt; ResponseEntity.notFound().build());
+    }
+}</code></pre>
+    </div>
+  </div>
+</section>
+
+<section id="async">
+  <h2>4. Async Handling — the core difference</h2>
+
+  <h3>4.1 ASP.NET Core: <code>async</code>/<code>await</code> (Task-based)</h3>
+  <p>
+    ASP.NET Core uses C#'s native <code>Task</code>-based Asynchronous Pattern (TAP), built on the language keywords
+    <code>async</code>/<code>await</code>. Under the hood, an async method is compiled into a state machine.
+    When you <code>await</code> an I/O call, the thread is <strong>released back to the thread pool</strong> instead of blocking,
+    and Kestrel can use it to serve another request. When the I/O completes, execution resumes on a thread-pool thread
+    (via <code>SynchronizationContext</code>/continuation), picking up exactly where it left off.
+  </p>
+  <ul>
+    <li>Single unified model — one <code>Task</code>/<code>Task&lt;T&gt;</code> type for all async operations.</li>
+    <li>Non-blocking I/O is largely automatic once you <code>await</code> the right APIs (EF Core, HttpClient, etc. all expose async methods).</li>
+    <li>Compiler-generated continuations mean you write async code that <em>reads like</em> synchronous code.</li>
+    <li>Cheap: no extra threads are created for waiting — the thread pool thread is simply freed during the wait.</li>
+  </ul>
+  <div class="code-block dotnet" style="margin-top:12px;">
+    <div class="label">ASP.NET Core — async all the way down</div>
+    <pre><code><span class="kw">public async</span> <span class="type">Task</span>&lt;<span class="type">Order</span>?&gt; GetByIdAsync(<span class="type">int</span> id)
+{
+    <span class="cmt">// Thread is released while EF Core waits on the DB</span>
+    <span class="kw">return await</span> _db.Orders
+        .AsNoTracking()
+        .FirstOrDefaultAsync(o =&gt; o.Id == id);
+}
+
+<span class="cmt">// Composing multiple independent async calls concurrently</span>
+<span class="kw">public async</span> <span class="type">Task</span>&lt;<span class="type">Dashboard</span>&gt; BuildDashboardAsync(<span class="type">int</span> userId)
+{
+    <span class="type">Task</span>&lt;<span class="type">List</span>&lt;<span class="type">Order</span>&gt;&gt; ordersTask = _orders.GetForUserAsync(userId);
+    <span class="type">Task</span>&lt;<span class="type">Profile</span>&gt; profileTask = _profiles.GetAsync(userId);
+
+    <span class="kw">await</span> <span class="type">Task</span>.WhenAll(ordersTask, profileTask);
+
+    <span class="kw">return new</span> <span class="type">Dashboard</span>(ordersTask.Result, profileTask.Result);
+}</code></pre>
+  </div>
+
+  <h3>4.2 Spring Boot: Servlet threads, WebFlux, and CompletableFuture</h3>
+  <p>
+    Spring Boot has three distinct paths, which is the biggest structural difference from ASP.NET Core's single model:
+  </p>
+  <ul>
+    <li><strong>Traditional Spring MVC (default, servlet-based):</strong> synchronous by default — each request occupies a thread from the servlet container's thread pool for the whole request lifecycle. "Async" here (<code>DeferredResult</code>, <code>Callable&lt;T&gt;</code>) frees the servlet-handling thread but the actual blocking work still runs on another pooled thread.</li>
+    <li><strong>CompletableFuture:</strong> Java's manual async composition tool, similar in spirit to <code>Task</code>, but without language-level <code>await</code> — you chain callbacks (<code>thenApply</code>, <code>thenCompose</code>) instead of writing linear code.</li>
+    <li><strong>Spring WebFlux (reactive):</strong> a genuinely non-blocking model built on Project Reactor's <code>Mono</code>/<code>Flux</code>, running on a small fixed pool of event-loop threads (Netty by default) — closer in spirit to how ASP.NET Core/Kestrel behaves natively, but requires a fully reactive stack (R2DBC instead of JPA, etc.).</li>
+  </ul>
+  <div class="code-grid" style="margin-top:12px;">
+    <div class="code-block spring">
+      <div class="label">Spring MVC — CompletableFuture</div>
+      <pre><code><span class="kw">@GetMapping</span>(<span class="str">"/{id}"</span>)
+<span class="kw">public</span> <span class="type">CompletableFuture</span>&lt;<span class="type">ResponseEntity</span>&lt;<span class="type">Order</span>&gt;&gt; getById(
+        <span class="kw">@PathVariable</span> <span class="type">Long</span> id) {
+
+    <span class="kw">return</span> service.findByIdAsync(id)
+        .thenApply(opt -&gt; opt
+            .map(ResponseEntity::ok)
+            .orElseGet(() -&gt; ResponseEntity.notFound().build()));
+}
+
+<span class="cmt">// Service layer — runs on a separate executor</span>
+<span class="kw">@Async</span>
+<span class="kw">public</span> <span class="type">CompletableFuture</span>&lt;<span class="type">Optional</span>&lt;<span class="type">Order</span>&gt;&gt; findByIdAsync(<span class="type">Long</span> id) {
+    <span class="kw">return</span> <span class="type">CompletableFuture</span>.supplyAsync(() -&gt;
+        repository.findById(id));
+}</code></pre>
+    </div>
+    <div class="code-block spring">
+      <div class="label">Spring WebFlux — Reactive (Mono)</div>
+      <pre><code><span class="kw">@GetMapping</span>(<span class="str">"/{id}"</span>)
+<span class="kw">public</span> <span class="type">Mono</span>&lt;<span class="type">ResponseEntity</span>&lt;<span class="type">Order</span>&gt;&gt; getById(
+        <span class="kw">@PathVariable</span> <span class="type">Long</span> id) {
+
+    <span class="kw">return</span> repository.findById(id)      <span class="cmt">// Mono&lt;Order&gt;</span>
+        .map(ResponseEntity::ok)
+        .defaultIfEmpty(ResponseEntity.notFound().build());
+}
+
+<span class="cmt">// Combining independent reactive calls concurrently</span>
+<span class="kw">public</span> <span class="type">Mono</span>&lt;<span class="type">Dashboard</span>&gt; buildDashboard(<span class="type">Long</span> userId) {
+    <span class="kw">return</span> <span class="type">Mono</span>.zip(
+        orderRepo.findAllByUser(userId).collectList(),
+        profileRepo.findById(userId)
+    ).map(t -&gt; <span class="kw">new</span> <span class="type">Dashboard</span>(t.getT1(), t.getT2()));
+}</code></pre>
+    </div>
+  </div>
+
+  <h3>4.3 Side-by-side: the mental model</h3>
+  <table>
+    <tr><th>Trait</th><th class="dotnet-col">ASP.NET Core</th><th class="spring-col">Spring Boot</th></tr>
+    <tr>
+      <td>Default request model</td>
+      <td class="dotnet-col">Async by default (Kestrel is event-driven; async is idiomatic everywhere)</td>
+      <td class="spring-col">Sync/blocking by default (Spring MVC + servlet threads); async/reactive is opt-in</td>
+    </tr>
+    <tr>
+      <td>Syntax</td>
+      <td class="dotnet-col"><code>async</code>/<code>await</code> keywords — linear, compiler-managed state machine</td>
+      <td class="spring-col">Either blocking code, callback-chained <code>CompletableFuture</code>, or <code>Mono</code>/<code>Flux</code> operator chains</td>
+    </tr>
+    <tr>
+      <td>Thread behavior</td>
+      <td class="dotnet-col">Thread returns to pool while awaiting I/O; resumes on any pool thread</td>
+      <td class="spring-col">MVC: thread blocked for the whole request unless you manually opt into async. WebFlux: small event-loop pool, never blocks</td>
+    </tr>
+    <tr>
+      <td>Data access</td>
+      <td class="dotnet-col">EF Core is async-native (<code>ToListAsync</code>, <code>FirstOrDefaultAsync</code>, etc.)</td>
+      <td class="spring-col">Spring Data JPA/Hibernate is blocking; true non-blocking DB access needs R2DBC + WebFlux</td>
+    </tr>
+    <tr>
+      <td>Learning curve</td>
+      <td class="dotnet-col">One consistent pattern to learn</td>
+      <td class="spring-col">Three coexisting patterns (blocking, CompletableFuture, reactive) — choose per project</td>
+    </tr>
+  </table>
+
+  <div class="callout">
+    <strong>In short:</strong> ASP.NET Core treats async as the default, unified way of doing I/O, with the compiler doing the heavy lifting via <code>async</code>/<code>await</code>. Spring Boot's traditional MVC stack is synchronous by default and thread-per-request; to get non-blocking behavior you either bolt on <code>CompletableFuture</code>/<code>@Async</code> (still thread-pool based) or adopt the fully reactive WebFlux stack (<code>Mono</code>/<code>Flux</code>), which is a bigger architectural commitment since it changes your data-access layer too.
+  </div>
+</section>
+
+<section id="di">
+  <h2>5. Dependency Injection</h2>
+  <div class="code-grid">
+    <div class="code-block dotnet">
+      <div class="label">ASP.NET Core</div>
+      <pre><code>builder.Services.AddScoped&lt;<span class="type">IOrderService</span>, <span class="type">OrderService</span>&gt;();
+builder.Services.AddSingleton&lt;<span class="type">ICacheService</span>, <span class="type">CacheService</span>&gt;();
+builder.Services.AddTransient&lt;<span class="type">IEmailSender</span>, <span class="type">EmailSender</span>&gt;();</code></pre>
+    </div>
+    <div class="code-block spring">
+      <div class="label">Spring Boot</div>
+      <pre><code><span class="kw">@Service</span>
+<span class="kw">public class</span> <span class="type">OrderService</span> { ... }  <span class="cmt">// singleton by default</span>
+
+<span class="kw">@Service</span>
+<span class="kw">@Scope</span>(<span class="str">"prototype"</span>)
+<span class="kw">public class</span> <span class="type">EmailSender</span> { ... }  <span class="cmt">// new instance per injection</span></code></pre>
+    </div>
+  </div>
+  <p class="muted">Both frameworks support constructor injection as the recommended style. ASP.NET Core registers services explicitly with a lifetime (<code>Singleton</code>/<code>Scoped</code>/<code>Transient</code>); Spring Boot defaults every <code>@Component</code>/<code>@Service</code>/<code>@Repository</code> to a singleton bean unless you annotate otherwise.</p>
+</section>
+
+<section id="controller-design">
+  <h2>6. Controller Design</h2>
+  <p>Both use attribute/annotation-driven routing on top of an MVC-style dispatcher, but the conventions differ.</p>
+  <div class="code-grid">
+    <div class="code-block dotnet">
+      <div class="label">ASP.NET Core — full controller</div>
+      <pre><code>[<span class="type">ApiController</span>]
+[<span class="type">Route</span>(<span class="str">"api/[controller]"</span>)]
+<span class="kw">public class</span> <span class="type">OrdersController</span> : <span class="type">ControllerBase</span>
+{
+    <span class="kw">private readonly</span> <span class="type">IOrderService</span> _service;
+    <span class="kw">public</span> OrdersController(<span class="type">IOrderService</span> s) =&gt; _service = s;
+
+    [<span class="type">HttpGet</span>]
+    <span class="kw">public async</span> <span class="type">Task</span>&lt;<span class="type">ActionResult</span>&lt;<span class="type">IEnumerable</span>&lt;<span class="type">OrderDto</span>&gt;&gt;&gt; GetAll(
+        [<span class="type">FromQuery</span>] <span class="type">int</span> page = 1)
+        =&gt; Ok(<span class="kw">await</span> _service.GetPagedAsync(page));
+
+    [<span class="type">HttpPost</span>]
+    <span class="kw">public async</span> <span class="type">Task</span>&lt;<span class="type">IActionResult</span>&gt; Create(
+        [<span class="type">FromBody</span>] <span class="type">CreateOrderDto</span> dto)
+    {
+        <span class="kw">var</span> created = <span class="kw">await</span> _service.CreateAsync(dto);
+        <span class="kw">return</span> CreatedAtAction(<span class="kw">nameof</span>(GetById),
+            <span class="kw">new</span> { id = created.Id }, created);
+    }
+}</code></pre>
+    </div>
+    <div class="code-block spring">
+      <div class="label">Spring Boot — full controller</div>
+      <pre><code><span class="kw">@RestController</span>
+<span class="kw">@RequestMapping</span>(<span class="str">"/api/orders"</span>)
+<span class="kw">@RequiredArgsConstructor</span>  <span class="cmt">// Lombok: generates constructor</span>
+<span class="kw">public class</span> <span class="type">OrderController</span> {
+
+    <span class="kw">private final</span> <span class="type">OrderService</span> service;
+
+    <span class="kw">@GetMapping</span>
+    <span class="kw">public</span> <span class="type">List</span>&lt;<span class="type">OrderDto</span>&gt; getAll(
+            <span class="kw">@RequestParam</span>(defaultValue = <span class="str">"1"</span>) <span class="type">int</span> page) {
+        <span class="kw">return</span> service.getPaged(page);
+    }
+
+    <span class="kw">@PostMapping</span>
+    <span class="kw">public</span> <span class="type">ResponseEntity</span>&lt;<span class="type">OrderDto</span>&gt; create(
+            <span class="kw">@RequestBody @Valid</span> <span class="type">CreateOrderDto</span> dto) {
+        <span class="type">OrderDto</span> created = service.create(dto);
+        <span class="kw">return</span> ResponseEntity
+            .created(URI.create(<span class="str">"/api/orders/"</span> + created.getId()))
+            .body(created);
+    }
+}</code></pre>
+    </div>
+  </div>
+  <table style="margin-top:14px;">
+    <tr><th>Aspect</th><th class="dotnet-col">ASP.NET Core</th><th class="spring-col">Spring Boot</th></tr>
+    <tr><td>Route declaration</td><td class="dotnet-col"><code>[Route]</code>, <code>[HttpGet]</code>, <code>[HttpPost]</code> attributes</td><td class="spring-col"><code>@RequestMapping</code>, <code>@GetMapping</code>, <code>@PostMapping</code> annotations</td></tr>
+    <tr><td>Body binding</td><td class="dotnet-col"><code>[FromBody]</code>, <code>[FromQuery]</code>, <code>[FromRoute]</code> explicit</td><td class="spring-col"><code>@RequestBody</code>, <code>@RequestParam</code>, <code>@PathVariable</code> explicit</td></tr>
+    <tr><td>Return wrapping</td><td class="dotnet-col"><code>IActionResult</code> / <code>ActionResult&lt;T&gt;</code>, helpers like <code>Ok()</code>, <code>NotFound()</code></td><td class="spring-col"><code>ResponseEntity&lt;T&gt;</code> for full control, or plain POJO for auto-200</td></tr>
+    <tr><td>Boilerplate reduction</td><td class="dotnet-col">Primary constructors (C# 12) or manual constructor</td><td class="spring-col">Lombok <code>@RequiredArgsConstructor</code> commonly used to cut ceremony</td></tr>
+  </table>
+</section>
+
+<section id="service-design">
+  <h2>7. Service Layer Design</h2>
+  <p>Both frameworks encourage a thin controller / fat service split, with the service layer depending on repository abstractions rather than the DB directly.</p>
+  <div class="code-grid">
+    <div class="code-block dotnet">
+      <div class="label">ASP.NET Core — service</div>
+      <pre><code><span class="kw">public interface</span> <span class="type">IOrderService</span>
+{
+    <span class="type">Task</span>&lt;<span class="type">OrderDto</span>&gt; CreateAsync(<span class="type">CreateOrderDto</span> dto);
+}
+
+<span class="kw">public class</span> <span class="type">OrderService</span> : <span class="type">IOrderService</span>
+{
+    <span class="kw">private readonly</span> <span class="type">IOrderRepository</span> _repo;
+    <span class="kw">private readonly</span> <span class="type">IMapper</span> _mapper;
+
+    <span class="kw">public</span> OrderService(<span class="type">IOrderRepository</span> repo, <span class="type">IMapper</span> mapper)
+    {
+        _repo = repo;
+        _mapper = mapper;
+    }
+
+    <span class="kw">public async</span> <span class="type">Task</span>&lt;<span class="type">OrderDto</span>&gt; CreateAsync(<span class="type">CreateOrderDto</span> dto)
+    {
+        <span class="kw">var</span> order = _mapper.Map&lt;<span class="type">Order</span>&gt;(dto);
+        order.Status = <span class="type">OrderStatus</span>.Pending;
+
+        <span class="kw">await</span> _repo.AddAsync(order);
+        <span class="kw">await</span> _repo.SaveChangesAsync();
+
+        <span class="kw">return</span> _mapper.Map&lt;<span class="type">OrderDto</span>&gt;(order);
+    }
+}</code></pre>
+    </div>
+    <div class="code-block spring">
+      <div class="label">Spring Boot — service</div>
+      <pre><code><span class="kw">public interface</span> <span class="type">OrderService</span> {
+    <span class="type">OrderDto</span> create(<span class="type">CreateOrderDto</span> dto);
+}
+
+<span class="kw">@Service</span>
+<span class="kw">@RequiredArgsConstructor</span>
+<span class="kw">public class</span> <span class="type">OrderServiceImpl</span> <span class="kw">implements</span> <span class="type">OrderService</span> {
+
+    <span class="kw">private final</span> <span class="type">OrderRepository</span> repository;
+    <span class="kw">private final</span> <span class="type">OrderMapper</span> mapper;  <span class="cmt">// MapStruct</span>
+
+    <span class="kw">@Override</span>
+    <span class="kw">@Transactional</span>
+    <span class="kw">public</span> <span class="type">OrderDto</span> create(<span class="type">CreateOrderDto</span> dto) {
+        <span class="type">Order</span> order = mapper.toEntity(dto);
+        order.setStatus(<span class="type">OrderStatus</span>.PENDING);
+
+        <span class="type">Order</span> saved = repository.save(order);
+        <span class="kw">return</span> mapper.toDto(saved);
+    }
+}</code></pre>
+    </div>
+  </div>
+  <div class="callout">
+    <strong>Notable difference:</strong> Spring Boot's <code>@Transactional</code> annotation declaratively wraps a method in a DB transaction (commit/rollback handled by an AOP proxy). ASP.NET Core has no direct annotation equivalent — transactions are typically managed explicitly via <code>_db.Database.BeginTransactionAsync()</code>, or implicitly by <code>SaveChangesAsync()</code> for simple single-call cases.
+  </div>
+</section>
+
+<section id="db-design">
+  <h2>8. Database / Entity Design</h2>
+  <div class="code-grid">
+    <div class="code-block dotnet">
+      <div class="label">ASP.NET Core — EF Core entity + DbContext</div>
+      <pre><code><span class="kw">public class</span> <span class="type">Order</span>
+{
+    <span class="kw">public int</span> Id { <span class="kw">get</span>; <span class="kw">set</span>; }
+    <span class="kw">public string</span> CustomerName { <span class="kw">get</span>; <span class="kw">set</span>; } = <span class="str">""</span>;
+    <span class="kw">public decimal</span> Total { <span class="kw">get</span>; <span class="kw">set</span>; }
+    <span class="kw">public</span> <span class="type">OrderStatus</span> Status { <span class="kw">get</span>; <span class="kw">set</span>; }
+    <span class="kw">public</span> <span class="type">List</span>&lt;<span class="type">OrderItem</span>&gt; Items { <span class="kw">get</span>; <span class="kw">set</span>; } = <span class="kw">new</span>();
+}
+
+<span class="kw">public class</span> <span class="type">AppDbContext</span> : <span class="type">DbContext</span>
+{
+    <span class="kw">public</span> AppDbContext(<span class="type">DbContextOptions</span> o) : <span class="kw">base</span>(o) { }
+
+    <span class="kw">public</span> <span class="type">DbSet</span>&lt;<span class="type">Order</span>&gt; Orders =&gt; <span class="type">Set</span>&lt;<span class="type">Order</span>&gt;();
+
+    <span class="kw">protected override void</span> OnModelCreating(<span class="type">ModelBuilder</span> mb)
+    {
+        mb.Entity&lt;<span class="type">Order</span>&gt;()
+          .Property(o =&gt; o.Total)
+          .HasPrecision(18, 2);
+    }
+}
+
+<span class="cmt">// Repository (custom, or use DbContext directly)</span>
+<span class="kw">public async</span> <span class="type">Task</span>&lt;<span class="type">Order</span>?&gt; GetWithItemsAsync(<span class="type">int</span> id)
+    =&gt; <span class="kw">await</span> _db.Orders
+        .Include(o =&gt; o.Items)
+        .FirstOrDefaultAsync(o =&gt; o.Id == id);</code></pre>
+    </div>
+    <div class="code-block spring">
+      <div class="label">Spring Boot — JPA entity + repository</div>
+      <pre><code><span class="kw">@Entity</span>
+<span class="kw">@Table</span>(name = <span class="str">"orders"</span>)
+<span class="kw">@Data</span>  <span class="cmt">// Lombok: getters/setters</span>
+<span class="kw">public class</span> <span class="type">Order</span> {
+
+    <span class="kw">@Id</span>
+    <span class="kw">@GeneratedValue</span>(strategy = <span class="type">GenerationType</span>.IDENTITY)
+    <span class="kw">private</span> <span class="type">Long</span> id;
+
+    <span class="kw">private</span> <span class="type">String</span> customerName;
+
+    <span class="kw">@Column</span>(precision = 18, scale = 2)
+    <span class="kw">private</span> <span class="type">BigDecimal</span> total;
+
+    <span class="kw">@Enumerated</span>(<span class="type">EnumType</span>.STRING)
+    <span class="kw">private</span> <span class="type">OrderStatus</span> status;
+
+    <span class="kw">@OneToMany</span>(mappedBy = <span class="str">"order"</span>, cascade = CascadeType.ALL)
+    <span class="kw">private</span> <span class="type">List</span>&lt;<span class="type">OrderItem</span>&gt; items = <span class="kw">new</span> ArrayList&lt;&gt;();
+}
+
+<span class="cmt">// Repository — Spring Data derives the query from the method name</span>
+<span class="kw">public interface</span> <span class="type">OrderRepository</span>
+        <span class="kw">extends</span> <span class="type">JpaRepository</span>&lt;<span class="type">Order</span>, <span class="type">Long</span>&gt; {
+
+    <span class="kw">@EntityGraph</span>(attributePaths = <span class="str">"items"</span>)
+    <span class="type">Optional</span>&lt;<span class="type">Order</span>&gt; findById(<span class="type">Long</span> id);
+}</code></pre>
+    </div>
+  </div>
+  <table style="margin-top:14px;">
+    <tr><th>Aspect</th><th class="dotnet-col">ASP.NET Core (EF Core)</th><th class="spring-col">Spring Boot (Spring Data JPA)</th></tr>
+    <tr><td>Entity mapping</td><td class="dotnet-col">Plain C# classes + Fluent API (<code>OnModelCreating</code>) or data annotations</td><td class="spring-col">Annotated POJOs (<code>@Entity</code>, <code>@Column</code>, <code>@OneToMany</code>)</td></tr>
+    <tr><td>Repository pattern</td><td class="dotnet-col"><code>DbContext</code>/<code>DbSet&lt;T&gt;</code> used directly, or a custom repository wrapper</td><td class="spring-col"><code>JpaRepository&lt;T, ID&gt;</code> — CRUD methods auto-generated, custom queries derived from method names or <code>@Query</code></td></tr>
+    <tr><td>Migrations</td><td class="dotnet-col"><code>dotnet ef migrations add</code> / <code>update</code></td><td class="spring-col">Flyway or Liquibase (not built in — added as a dependency)</td></tr>
+    <tr><td>Eager loading</td><td class="dotnet-col"><code>.Include()</code> / <code>.ThenInclude()</code></td><td class="spring-col"><code>@EntityGraph</code>, <code>JOIN FETCH</code> in JPQL, or fetch-type config</td></tr>
+  </table>
+</section>
+
+<section id="dto-design">
+  <h2>9. DTO Design</h2>
+  <p>Both frameworks push toward keeping entities out of the API surface — DTOs (or "records") decouple the wire contract from the persistence model.</p>
+  <div class="code-grid">
+    <div class="code-block dotnet">
+      <div class="label">ASP.NET Core — DTOs as records</div>
+      <pre><code><span class="cmt">// Request DTO — immutable record, concise</span>
+<span class="kw">public record</span> <span class="type">CreateOrderDto</span>(
+    <span class="type">string</span> CustomerName,
+    <span class="type">List</span>&lt;<span class="type">OrderItemDto</span>&gt; Items
+);
+
+<span class="cmt">// Response DTO</span>
+<span class="kw">public record</span> <span class="type">OrderDto</span>(
+    <span class="type">int</span> Id,
+    <span class="type">string</span> CustomerName,
+    <span class="type">decimal</span> Total,
+    <span class="type">string</span> Status
+);
+
+<span class="cmt">// Mapping — AutoMapper profile</span>
+<span class="kw">public class</span> <span class="type">OrderProfile</span> : <span class="type">Profile</span>
+{
+    <span class="kw">public</span> OrderProfile()
+    {
+        CreateMap&lt;<span class="type">Order</span>, <span class="type">OrderDto</span>&gt;()
+            .ForMember(d =&gt; d.Status, o =&gt; o.MapFrom(s =&gt; s.Status.ToString()));
+        CreateMap&lt;<span class="type">CreateOrderDto</span>, <span class="type">Order</span>&gt;();
+    }
+}</code></pre>
+    </div>
+    <div class="code-block spring">
+      <div class="label">Spring Boot — DTOs as records + MapStruct</div>
+      <pre><code><span class="cmt">// Request DTO — Java record (Java 16+)</span>
+<span class="kw">public record</span> <span class="type">CreateOrderDto</span>(
+    <span class="kw">@NotBlank</span> <span class="type">String</span> customerName,
+    <span class="kw">@NotEmpty</span> <span class="type">List</span>&lt;<span class="type">OrderItemDto</span>&gt; items
+) {}
+
+<span class="cmt">// Response DTO</span>
+<span class="kw">public record</span> <span class="type">OrderDto</span>(
+    <span class="type">Long</span> id,
+    <span class="type">String</span> customerName,
+    <span class="type">BigDecimal</span> total,
+    <span class="type">String</span> status
+) {}
+
+<span class="cmt">// Mapping — MapStruct interface (compile-time generated impl)</span>
+<span class="kw">@Mapper</span>(componentModel = <span class="str">"spring"</span>)
+<span class="kw">public interface</span> <span class="type">OrderMapper</span> {
+    <span class="kw">@Mapping</span>(target = <span class="str">"status"</span>, expression = <span class="str">"java(order.getStatus().name())"</span>)
+    <span class="type">OrderDto</span> toDto(<span class="type">Order</span> order);
+
+    <span class="type">Order</span> toEntity(<span class="type">CreateOrderDto</span> dto);
+}</code></pre>
+    </div>
+  </div>
+  <p class="muted">Both ecosystems now favor immutable records for DTOs. The main difference is tooling: ASP.NET Core commonly uses <strong>AutoMapper</strong> (runtime reflection-based mapping configured in profiles), while Spring Boot commonly uses <strong>MapStruct</strong> (annotation processor that generates plain mapping code at compile time — faster, and errors surface at build time rather than runtime).</p>
+
+  <h3>9.1 Mapper design patterns, side by side</h3>
+  <div class="code-grid">
+    <div class="code-block dotnet">
+      <div class="label">AutoMapper — nested, ignored &amp; collection mapping</div>
+      <pre><code><span class="kw">public class</span> <span class="type">OrderProfile</span> : <span class="type">Profile</span>
+{
+    <span class="kw">public</span> OrderProfile()
+    {
+        <span class="cmt">// Ignore a member — computed or set elsewhere</span>
+        CreateMap&lt;<span class="type">CreateOrderDto</span>, <span class="type">Order</span>&gt;()
+            .ForMember(d =&gt; d.Id, opt =&gt; opt.Ignore());
+
+        <span class="cmt">// Nested object mapping — resolved automatically
+        // as long as a matching CreateMap exists for the nested types</span>
+        CreateMap&lt;<span class="type">OrderItemDto</span>, <span class="type">OrderItem</span>&gt;();
+        CreateMap&lt;<span class="type">Order</span>, <span class="type">OrderDto</span>&gt;()
+            .ForMember(d =&gt; d.Items, o =&gt; o.MapFrom(s =&gt; s.Items));  <span class="cmt">// List&lt;OrderItem&gt; → List&lt;OrderItemDto&gt;</span>
+
+        <span class="cmt">// Conditional / custom logic mapping</span>
+        CreateMap&lt;<span class="type">Order</span>, <span class="type">OrderSummaryDto</span>&gt;()
+            .ForMember(d =&gt; d.IsOverdue,
+                o =&gt; o.MapFrom(s =&gt; s.DueDate &lt; DateTime.UtcNow));
+    }
+}
+
+<span class="cmt">// Usage — resolved at runtime via reflection/expression trees</span>
+<span class="type">OrderDto</span> dto = _mapper.Map&lt;<span class="type">OrderDto</span>&gt;(order);
+<span class="type">List</span>&lt;<span class="type">OrderDto</span>&gt; dtos = _mapper.Map&lt;<span class="type">List</span>&lt;<span class="type">OrderDto</span>&gt;&gt;(orders);</code></pre>
+    </div>
+    <div class="code-block spring">
+      <div class="label">MapStruct — nested, ignored &amp; collection mapping</div>
+      <pre><code><span class="kw">@Mapper</span>(componentModel = <span class="str">"spring"</span>)
+<span class="kw">public interface</span> <span class="type">OrderMapper</span> {
+
+    <span class="cmt">// Ignore a member — computed or set elsewhere</span>
+    <span class="kw">@Mapping</span>(target = <span class="str">"id"</span>, ignore = <span class="kw">true</span>)
+    <span class="type">Order</span> toEntity(<span class="type">CreateOrderDto</span> dto);
+
+    <span class="cmt">// Nested object mapping — MapStruct auto-generates the call
+    // to OrderItemMapper as long as it's a known @Mapper / declared uses</span>
+    <span class="kw">@Mapping</span>(target = <span class="str">"items"</span>, source = <span class="str">"items"</span>)
+    <span class="type">OrderDto</span> toDto(<span class="type">Order</span> order);
+
+    <span class="type">OrderItemDto</span> toDto(<span class="type">OrderItem</span> item);  <span class="cmt">// used automatically for List&lt;OrderItem&gt;</span>
+
+    <span class="cmt">// Conditional / custom logic mapping — via a default method</span>
+    <span class="kw">default</span> <span class="type">OrderSummaryDto</span> toSummary(<span class="type">Order</span> order) {
+        <span class="kw">return new</span> <span class="type">OrderSummaryDto</span>(
+            order.getId(),
+            order.getDueDate().isBefore(LocalDateTime.now())
+        );
+    }
+}
+
+<span class="cmt">// Usage — generated implementation class, no reflection at runtime</span>
+<span class="type">OrderDto</span> dto = orderMapper.toDto(order);
+<span class="type">List</span>&lt;<span class="type">OrderDto</span>&gt; dtos = order.stream().map(orderMapper::toDto).toList();</code></pre>
+    </div>
+  </div>
+  <table style="margin-top:14px;">
+    <tr><th>Aspect</th><th class="dotnet-col">AutoMapper (ASP.NET Core)</th><th class="spring-col">MapStruct (Spring Boot)</th></tr>
+    <tr><td>How mapping is resolved</td><td class="dotnet-col">Runtime — reflection/compiled expression trees built from your <code>Profile</code> configuration</td><td class="spring-col">Compile-time — an annotation processor generates a plain Java implementation class during the build</td></tr>
+    <tr><td>Performance</td><td class="dotnet-col">Slightly slower (first-call configuration validation + expression compilation), fine for most APIs</td><td class="spring-col">Effectively as fast as hand-written mapping code, since that's literally what gets generated</td></tr>
+    <tr><td>Error detection</td><td class="dotnet-col">Missing/mismatched members often only surface at runtime (or via <code>AssertConfigurationIsValid()</code> in tests)</td><td class="spring-col">Missing/mismatched members are usually caught at <strong>compile time</strong> — the build fails with a clear message</td></tr>
+    <tr><td>Nested objects</td><td class="dotnet-col">Auto-resolved if a matching <code>CreateMap</code> exists for the nested types</td><td class="spring-col">Auto-resolved if a matching mapping method exists in the same or a <code>uses = {...}</code> referenced mapper</td></tr>
+    <tr><td>Debuggability</td><td class="dotnet-col">Harder to step through — mapping logic is generated/compiled internally</td><td class="spring-col">Easy to step through — the generated <code>OrderMapperImpl.java</code> is plain, readable Java you can open and debug directly</td></tr>
+    <tr><td>Configuration style</td><td class="dotnet-col">Centralized <code>Profile</code> classes registered once at startup</td><td class="spring-col">Per-mapper interface with <code>@Mapping</code> annotations; one interface per entity/DTO pair is typical</td></tr>
+  </table>
+</section>
+
+<section id="validation-design">
+  <h2>10. Validation Design</h2>
+  <div class="code-grid">
+    <div class="code-block dotnet">
+      <div class="label">ASP.NET Core — DataAnnotations / FluentValidation</div>
+      <pre><code><span class="cmt">// Option A: DataAnnotations directly on the DTO</span>
+<span class="kw">public record</span> <span class="type">CreateOrderDto</span>(
+    [<span class="type">Required</span>, <span class="type">StringLength</span>(100)] <span class="type">string</span> CustomerName,
+    [<span class="type">Range</span>(1, 100)] <span class="type">int</span> Quantity
+);
+
+<span class="cmt">// [ApiController] auto-returns 400 on invalid ModelState —
+// no manual check needed in the action method
+
+// Option B: FluentValidation (preferred for complex rules)</span>
+<span class="kw">public class</span> <span class="type">CreateOrderValidator</span> : <span class="type">AbstractValidator</span>&lt;<span class="type">CreateOrderDto</span>&gt;
+{
+    <span class="kw">public</span> CreateOrderValidator()
+    {
+        RuleFor(x =&gt; x.CustomerName).NotEmpty().MaximumLength(100);
+        RuleFor(x =&gt; x.Items).NotEmpty();
+        RuleForEach(x =&gt; x.Items).SetValidator(<span class="kw">new</span> <span class="type">OrderItemValidator</span>());
+    }
+}
+<span class="cmt">// registered: builder.Services.AddValidatorsFromAssemblyContaining&lt;CreateOrderValidator&gt;();</span></code></pre>
+    </div>
+    <div class="code-block spring">
+      <div class="label">Spring Boot — Bean Validation (JSR-380)</div>
+      <pre><code><span class="cmt">// Annotations directly on the DTO (javax/jakarta.validation)</span>
+<span class="kw">public record</span> <span class="type">CreateOrderDto</span>(
+    <span class="kw">@NotBlank</span> <span class="kw">@Size</span>(max = 100) <span class="type">String</span> customerName,
+    <span class="kw">@Min</span>(1) <span class="kw">@Max</span>(100) <span class="type">int</span> quantity
+) {}
+
+<span class="cmt">// Triggered by @Valid on the controller parameter —
+// throws MethodArgumentNotValidException on failure</span>
+<span class="kw">@PostMapping</span>
+<span class="kw">public</span> <span class="type">ResponseEntity</span>&lt;<span class="type">OrderDto</span>&gt; create(
+        <span class="kw">@RequestBody @Valid</span> <span class="type">CreateOrderDto</span> dto) { ... }
+
+<span class="cmt">// Custom validator for complex/cross-field rules</span>
+<span class="kw">@Constraint</span>(validatedBy = <span class="type">ItemsNotEmptyValidator</span>.<span class="kw">class</span>)
+<span class="kw">@Target</span>(ElementType.FIELD)
+<span class="kw">@Retention</span>(RetentionPolicy.RUNTIME)
+<span class="kw">public @interface</span> <span class="type">ValidItemList</span> {
+    <span class="type">String</span> message() <span class="kw">default</span> <span class="str">"items required"</span>;
+}</code></pre>
+    </div>
+  </div>
+  <table style="margin-top:14px;">
+    <tr><th>Aspect</th><th class="dotnet-col">ASP.NET Core</th><th class="spring-col">Spring Boot</th></tr>
+    <tr><td>Built-in mechanism</td><td class="dotnet-col">DataAnnotations (<code>[Required]</code>, <code>[Range]</code>) + automatic 400 via <code>[ApiController]</code></td><td class="spring-col">Bean Validation / Hibernate Validator (<code>@NotNull</code>, <code>@Size</code>) + <code>@Valid</code> trigger</td></tr>
+    <tr><td>Complex rules</td><td class="dotnet-col">FluentValidation — fluent, testable, decoupled from the model</td><td class="spring-col">Custom <code>@Constraint</code> annotations, or validation logic in the service layer</td></tr>
+    <tr><td>Error response</td><td class="dotnet-col">Automatic <code>ValidationProblemDetails</code> (RFC 7807) with field errors</td><td class="spring-col">Requires a <code>@RestControllerAdvice</code> handling <code>MethodArgumentNotValidException</code> to shape the error response</td></tr>
+  </table>
+</section>
+
+<section id="config-design">
+  <h2>11. Configuration Design</h2>
+  <div class="code-grid">
+    <div class="code-block dotnet">
+      <div class="label">ASP.NET Core — appsettings.json + Options pattern</div>
+      <pre><code><span class="cmt">// appsettings.json</span>
+{
+  <span class="str">"Stripe"</span>: {
+    <span class="str">"ApiKey"</span>: <span class="str">"sk_test_xxx"</span>,
+    <span class="str">"TimeoutSeconds"</span>: 30
+  }
+}
+
+<span class="cmt">// Strongly-typed options class</span>
+<span class="kw">public class</span> <span class="type">StripeOptions</span>
+{
+    <span class="kw">public string</span> ApiKey { <span class="kw">get</span>; <span class="kw">set</span>; } = <span class="str">""</span>;
+    <span class="kw">public int</span> TimeoutSeconds { <span class="kw">get</span>; <span class="kw">set</span>; }
+}
+
+<span class="cmt">// Registration</span>
+builder.Services.Configure&lt;<span class="type">StripeOptions</span>&gt;(
+    builder.Configuration.GetSection(<span class="str">"Stripe"</span>));
+
+<span class="cmt">// Injected via IOptions&lt;T&gt;</span>
+<span class="kw">public</span> PaymentService(<span class="type">IOptions</span>&lt;<span class="type">StripeOptions</span>&gt; opts)
+    =&gt; _apiKey = opts.Value.ApiKey;</code></pre>
+    </div>
+    <div class="code-block spring">
+      <div class="label">Spring Boot — application.yml + @ConfigurationProperties</div>
+      <pre><code><span class="cmt"># application.yml</span>
+stripe:
+  api-key: sk_test_xxx
+  timeout-seconds: 30
+
+<span class="cmt">// Strongly-typed config class</span>
+<span class="kw">@ConfigurationProperties</span>(prefix = <span class="str">"stripe"</span>)
+<span class="kw">public record</span> <span class="type">StripeProperties</span>(
+    <span class="type">String</span> apiKey,
+    <span class="type">int</span> timeoutSeconds
+) {}
+
+<span class="cmt">// Enable + inject directly (constructor injection)</span>
+<span class="kw">@Configuration</span>
+<span class="kw">@EnableConfigurationProperties</span>(StripeProperties.<span class="kw">class</span>)
+<span class="kw">public class</span> <span class="type">PaymentConfig</span> {}
+
+<span class="kw">@Service</span>
+<span class="kw">public class</span> <span class="type">PaymentService</span> {
+    <span class="kw">public</span> PaymentService(<span class="type">StripeProperties</span> props) {
+        <span class="kw">this</span>.apiKey = props.apiKey();
+    }
+}</code></pre>
+    </div>
+  </div>
+  <table style="margin-top:14px;">
+    <tr><th>Aspect</th><th class="dotnet-col">ASP.NET Core</th><th class="spring-col">Spring Boot</th></tr>
+    <tr><td>File format</td><td class="dotnet-col">appsettings.json (+ appsettings.{Environment}.json)</td><td class="spring-col">application.yml / .properties (+ application-{profile}.yml)</td></tr>
+    <tr><td>Environment switching</td><td class="dotnet-col"><code>ASPNETCORE_ENVIRONMENT</code> env var</td><td class="spring-col"><code>spring.profiles.active</code> property or <code>SPRING_PROFILES_ACTIVE</code> env var</td></tr>
+    <tr><td>Strong typing</td><td class="dotnet-col"><code>IOptions&lt;T&gt;</code> / <code>IOptionsSnapshot&lt;T&gt;</code> / <code>IOptionsMonitor&lt;T&gt;</code> (for reload)</td><td class="spring-col"><code>@ConfigurationProperties</code> classes, validated with <code>@Validated</code></td></tr>
+    <tr><td>Secrets</td><td class="dotnet-col">User Secrets (dev), Azure Key Vault / env vars (prod)</td><td class="spring-col">Env vars, Spring Cloud Config, or Vault integration</td></tr>
+  </table>
+</section>
+
+<section id="legacy-vs-modern">
+  <h2>12. Bonus: Legacy .NET Framework 4.8 (ASP.NET MVC) vs Modern .NET 8/10 (ASP.NET Core Web API)</h2>
+  <p>
+    This is a different axis from the Spring Boot comparison above — both sides here are ".NET", but one is the old
+    Windows-only framework most enterprise legacy systems still run on, and the other is the current cross-platform,
+    high-performance runtime. Many migration projects go straight from this legacy stack to ASP.NET Core.
+  </p>
+
+  <h3>12.1 Runtime &amp; Hosting</h3>
+  <table>
+    <tr><th>Aspect</th><th class="legacy-col">.NET Framework 4.8 (ASP.NET MVC 5)</th><th class="modern-col">.NET 8 / 10 (ASP.NET Core Web API)</th></tr>
+    <tr><td>Platform</td><td class="legacy-col">Windows only</td><td class="modern-col">Cross-platform — Windows, Linux, macOS, containers</td></tr>
+    <tr><td>Web server</td><td class="legacy-col">Requires IIS (System.Web pipeline)</td><td class="modern-col">Self-hosted Kestrel, optionally behind IIS/Nginx/Apache as reverse proxy</td></tr>
+    <tr><td>Runtime lifecycle</td><td class="legacy-col">Tied to Windows/.NET Framework installed on the machine, one version system-wide</td><td class="modern-col">Side-by-side versions; app can ship its own runtime (self-contained deploy)</td></tr>
+    <tr><td>Performance</td><td class="legacy-col">Slower request pipeline, heavier per-request overhead (System.Web)</td><td class="modern-col">Significantly faster — rewritten pipeline, minimal allocations, top of TechEmpower benchmarks</td></tr>
+    <tr><td>Support status</td><td class="legacy-col">In maintenance mode — no new features, security patches only</td><td class="modern-col">Actively developed, new releases (LTS every 2 years — .NET 8 LTS, .NET 10 LTS)</td></tr>
+  </table>
+
+  <h3>12.2 Startup &amp; Configuration</h3>
+  <div class="code-grid">
+    <div class="code-block legacy">
+      <div class="label">.NET Framework 4.8 — Global.asax.cs + web.config</div>
+      <pre><code><span class="cmt">// Global.asax.cs</span>
+<span class="kw">public class</span> <span class="type">MvcApplication</span> : <span class="type">System.Web.HttpApplication</span>
+{
+    <span class="kw">protected void</span> Application_Start()
+    {
+        AreaRegistration.RegisterAllAreas();
+        FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
+        RouteConfig.RegisterRoutes(RouteTable.Routes);
+        BundleConfig.RegisterBundles(BundleTable.Bundles);
+        UnityConfig.RegisterComponents();  <span class="cmt">// third-party DI</span>
+    }
+}
+
+<span class="cmt">&lt;!-- web.config --&gt;</span>
+&lt;configuration&gt;
+  &lt;appSettings&gt;
+    &lt;add key=<span class="str">"StripeApiKey"</span> value=<span class="str">"sk_test_xxx"</span> /&gt;
+  &lt;/appSettings&gt;
+  &lt;connectionStrings&gt;
+    &lt;add name=<span class="str">"Default"</span>
+         connectionString=<span class="str">"Server=.;Database=Shop;..."</span> /&gt;
+  &lt;/connectionStrings&gt;
+&lt;/configuration&gt;
+
+<span class="cmt">// Reading config — string-based, no strong typing built in</span>
+<span class="type">string</span> apiKey = ConfigurationManager.AppSettings[<span class="str">"StripeApiKey"</span>];</code></pre>
+    </div>
+    <div class="code-block modern">
+      <div class="label">.NET 8/10 — Program.cs (minimal hosting) + appsettings.json</div>
+      <pre><code><span class="cmt">// Program.cs — replaces Global.asax, RouteConfig, web.config wiring</span>
+<span class="kw">var</span> builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddControllers();
+builder.Services.AddScoped&lt;<span class="type">IOrderService</span>, <span class="type">OrderService</span>&gt;();  <span class="cmt">// built-in DI</span>
+builder.Services.Configure&lt;<span class="type">StripeOptions</span>&gt;(
+    builder.Configuration.GetSection(<span class="str">"Stripe"</span>));
+builder.Services.AddDbContext&lt;<span class="type">AppDbContext</span>&gt;(opt =&gt;
+    opt.UseSqlServer(builder.Configuration.GetConnectionString(<span class="str">"Default"</span>)));
+
+<span class="kw">var</span> app = builder.Build();
+app.UseAuthorization();
+app.MapControllers();
+app.Run();
+
+<span class="cmt">// appsettings.json — hierarchical, strongly-typed via IOptions&lt;T&gt;</span>
+{
+  <span class="str">"Stripe"</span>: { <span class="str">"ApiKey"</span>: <span class="str">"sk_test_xxx"</span> },
+  <span class="str">"ConnectionStrings"</span>: { <span class="str">"Default"</span>: <span class="str">"Server=.;Database=Shop;..."</span> }
+}</code></pre>
+    </div>
+  </div>
+
+  <h3>12.3 Controller &amp; Routing</h3>
+  <div class="code-grid">
+    <div class="code-block legacy">
+      <div class="label">.NET Framework 4.8 — Web API 2 controller</div>
+      <pre><code><span class="cmt">// RouteConfig.cs / WebApiConfig.cs registers convention-based routes</span>
+<span class="kw">public static class</span> <span class="type">WebApiConfig</span>
+{
+    <span class="kw">public static void</span> Register(<span class="type">HttpConfiguration</span> config)
+    {
+        config.Routes.MapHttpRoute(
+            name: <span class="str">"DefaultApi"</span>,
+            routeTemplate: <span class="str">"api/{controller}/{id}"</span>,
+            defaults: <span class="kw">new</span> { id = RouteParameter.Optional }
+        );
+    }
+}
+
+<span class="cmt">// OrdersController.cs — inherits ApiController (System.Web.Http)</span>
+<span class="kw">public class</span> <span class="type">OrdersController</span> : <span class="type">ApiController</span>
+{
+    <span class="kw">private readonly</span> <span class="type">IOrderService</span> _service;
+    <span class="kw">public</span> OrdersController(<span class="type">IOrderService</span> service) =&gt; _service = service;
+
+    [<span class="type">HttpGet</span>]
+    [<span class="type">Route</span>(<span class="str">"api/orders/{id}"</span>)]
+    <span class="kw">public async</span> <span class="type">Task</span>&lt;<span class="type">IHttpActionResult</span>&gt; GetById(<span class="type">int</span> id)
+    {
+        <span class="kw">var</span> order = <span class="kw">await</span> _service.GetByIdAsync(id);
+        <span class="kw">if</span> (order == <span class="kw">null</span>) <span class="kw">return</span> NotFound();
+        <span class="kw">return</span> Ok(order);
+    }
+}
+<span class="cmt">// Note: MVC controllers (views) inherit System.Web.Mvc.Controller instead,
+// a *separate* base class/pipeline from Web API's ApiController — two stacks
+// bolted together, unlike ASP.NET Core's single unified model.</span></code></pre>
+    </div>
+    <div class="code-block modern">
+      <div class="label">.NET 8/10 — ASP.NET Core Web API controller</div>
+      <pre><code><span class="cmt">// No separate route config file — routing is attribute-based, inline</span>
+[<span class="type">ApiController</span>]
+[<span class="type">Route</span>(<span class="str">"api/[controller]"</span>)]
+<span class="kw">public class</span> <span class="type">OrdersController</span> : <span class="type">ControllerBase</span>
+{
+    <span class="kw">private readonly</span> <span class="type">IOrderService</span> _service;
+    <span class="kw">public</span> OrdersController(<span class="type">IOrderService</span> service) =&gt; _service = service;
+
+    [<span class="type">HttpGet</span>(<span class="str">"{id}"</span>)]
+    <span class="kw">public async</span> <span class="type">Task</span>&lt;<span class="type">IActionResult</span>&gt; GetById(<span class="type">int</span> id)
+    {
+        <span class="kw">var</span> order = <span class="kw">await</span> _service.GetByIdAsync(id);
+        <span class="kw">return</span> order <span class="kw">is null</span> ? NotFound() : Ok(order);
+    }
+}
+<span class="cmt">// One unified base (ControllerBase) for APIs — MVC views (if used)
+// share the same pipeline via Controller : ControllerBase.
+// Minimal APIs are also available as a controller-free alternative:</span>
+app.MapGet(<span class="str">"/api/orders/{id}"</span>, <span class="kw">async</span> (<span class="type">int</span> id, <span class="type">IOrderService</span> svc) =&gt;
+    <span class="kw">await</span> svc.GetByIdAsync(id) <span class="kw">is</span> { } order ? Results.Ok(order) : Results.NotFound());</code></pre>
+    </div>
+  </div>
+
+  <h3>12.4 Dependency Injection &amp; Middleware</h3>
+  <div class="code-grid">
+    <div class="code-block legacy">
+      <div class="label">.NET Framework 4.8 — third-party DI + HttpModules</div>
+      <pre><code><span class="cmt">// No built-in container — Unity/Ninject/Autofac required</span>
+<span class="kw">public static class</span> <span class="type">UnityConfig</span>
+{
+    <span class="kw">public static void</span> RegisterComponents()
+    {
+        <span class="kw">var</span> container = <span class="kw">new</span> <span class="type">UnityContainer</span>();
+        container.RegisterType&lt;<span class="type">IOrderService</span>, <span class="type">OrderService</span>&gt;();
+        GlobalConfiguration.Configuration.DependencyResolver =
+            <span class="kw">new</span> <span class="type">UnityDependencyResolver</span>(container);
+    }
+}
+
+<span class="cmt">// Cross-cutting logic (logging, auth) via HttpModules — registered in web.config</span>
+<span class="kw">public class</span> <span class="type">RequestLoggingModule</span> : <span class="type">IHttpModule</span>
+{
+    <span class="kw">public void</span> Init(<span class="type">HttpApplication</span> app)
+        =&gt; app.BeginRequest += (s, e) =&gt; { <span class="cmt">/* log */</span> };
+}
+<span class="cmt">&lt;!-- web.config --&gt;
+&lt;system.webServer&gt;
+  &lt;modules&gt;
+    &lt;add name="RequestLogging" type="MyApp.RequestLoggingModule" /&gt;
+  &lt;/modules&gt;
+&lt;/system.webServer&gt;</span></code></pre>
+    </div>
+    <div class="code-block modern">
+      <div class="label">.NET 8/10 — built-in DI + Middleware pipeline</div>
+      <pre><code><span class="cmt">// Built into the framework — no extra package needed</span>
+builder.Services.AddScoped&lt;<span class="type">IOrderService</span>, <span class="type">OrderService</span>&gt;();
+
+<span class="cmt">// Cross-cutting logic via Middleware — composed explicitly in Program.cs,
+// order of registration = order of execution</span>
+app.Use(<span class="kw">async</span> (context, next) =&gt;
+{
+    <span class="cmt">// log request</span>
+    <span class="kw">await</span> next();
+});
+
+app.UseAuthentication();
+app.UseAuthorization();
+app.MapControllers();</code></pre>
+    </div>
+  </div>
+
+  <h3>12.5 Side-by-side summary</h3>
+  <table>
+    <tr><th>Aspect</th><th class="legacy-col">.NET Framework 4.8 MVC</th><th class="modern-col">.NET 8/10 Core Web API</th></tr>
+    <tr><td>Config model</td><td class="legacy-col">web.config (XML), <code>ConfigurationManager</code>, string-keyed</td><td class="modern-col">appsettings.json (hierarchical), strongly-typed via <code>IOptions&lt;T&gt;</code></td></tr>
+    <tr><td>Startup</td><td class="legacy-col">Global.asax.cs + separate *Config.cs registration files</td><td class="modern-col">Single Program.cs, minimal hosting model, fluent builder</td></tr>
+    <tr><td>DI container</td><td class="legacy-col">None built in — Unity, Ninject, Autofac, etc.</td><td class="modern-col">Built into the framework (<code>IServiceCollection</code>)</td></tr>
+    <tr><td>Cross-cutting concerns</td><td class="legacy-col">HttpModules / HttpHandlers, configured in web.config</td><td class="modern-col">Composable middleware pipeline, configured in code</td></tr>
+    <tr><td>API vs MVC controllers</td><td class="legacy-col">Two separate base classes/pipelines: <code>System.Web.Mvc.Controller</code> and <code>System.Web.Http.ApiController</code></td><td class="modern-col">Unified: <code>ControllerBase</code> for APIs, <code>Controller</code> (adds view support) for MVC — one pipeline</td></tr>
+    <tr><td>JSON serializer</td><td class="legacy-col">Newtonsoft.Json (Json.NET) by default</td><td class="modern-col"><code>System.Text.Json</code> by default (faster, less allocation); Newtonsoft still pluggable</td></tr>
+    <tr><td>Deployment</td><td class="legacy-col">IIS-bound, Windows Server, full framework install required</td><td class="modern-col">Self-contained or framework-dependent, Docker/Linux/cloud-native friendly</td></tr>
+    <tr><td>Testability</td><td class="legacy-col">Harder — static <code>HttpContext.Current</code>, tight coupling to System.Web</td><td class="modern-col">Easier — DI-first design, abstractions like <code>HttpContext</code> injected, not static</td></tr>
+  </table>
+
+  <div class="callout">
+    <strong>Migration note:</strong> There's no direct upgrade path — moving from .NET Framework 4.8 to .NET 8/10 is a rewrite, not an in-place upgrade (Microsoft's <code>try-convert</code>/.NET Upgrade Assistant can automate parts of it, but the DI, config, and middleware models all change conceptually as shown above). This is different from moving between ASP.NET Core versions (e.g. .NET 8 → .NET 10), which is usually a much smaller, largely source-compatible change.
+  </div>
+</section>
+
+<section id="build-tooling">
+  <h2>13. Build Process &amp; Tooling</h2>
+  <p>
+    Beyond the code itself, the day-to-day build/run/deploy commands — and how many packages you have to
+    pull in to get a real project going — differ quite a bit between the two ecosystems.
+  </p>
+
+  <h3>13.1 Core build &amp; run commands</h3>
+  <table>
+    <tr><th>Task</th><th class="dotnet-col">ASP.NET Core (.NET CLI)</th><th class="spring-col">Spring Boot (Maven / Gradle)</th></tr>
+    <tr><td>Restore dependencies</td><td class="dotnet-col"><code>dotnet restore</code></td><td class="spring-col"><code>mvn install</code> &nbsp;/&nbsp; <code>gradle build</code> (auto-resolves)</td></tr>
+    <tr><td>Compile</td><td class="dotnet-col"><code>dotnet build</code></td><td class="spring-col"><code>mvn compile</code> &nbsp;/&nbsp; <code>gradle compileJava</code></td></tr>
+    <tr><td>Run locally (dev)</td><td class="dotnet-col"><code>dotnet run</code> (or F5 in Visual Studio)</td><td class="spring-col"><code>mvn spring-boot:run</code> &nbsp;/&nbsp; <code>gradle bootRun</code></td></tr>
+    <tr><td>Run tests</td><td class="dotnet-col"><code>dotnet test</code></td><td class="spring-col"><code>mvn test</code> &nbsp;/&nbsp; <code>gradle test</code></td></tr>
+    <tr><td>Package for deployment</td><td class="dotnet-col"><code>dotnet publish -c Release -o ./publish</code> → DLLs + runtime config</td><td class="spring-col"><code>mvn package</code> &nbsp;/&nbsp; <code>gradle build</code> → a single executable <strong>fat JAR</strong> (embedded Tomcat included)</td></tr>
+    <tr><td>Clean</td><td class="dotnet-col"><code>dotnet clean</code></td><td class="spring-col"><code>mvn clean</code> &nbsp;/&nbsp; <code>gradle clean</code></td></tr>
+    <tr><td>Build config file</td><td class="dotnet-col"><code>.csproj</code> (XML, per-project)</td><td class="spring-col"><code>pom.xml</code> (Maven) or <code>build.gradle</code> / <code>build.gradle.kts</code> (Gradle)</td></tr>
+  </table>
+  <div class="callout">
+    <strong>Deployable artifact difference:</strong> <code>dotnet publish</code> outputs a folder of DLLs that needs a .NET runtime (or is self-contained with one bundled). <code>mvn package</code>/<code>gradle build</code> produces a single runnable <code>.jar</code> with the embedded Tomcat server baked in — you just run <code>java -jar app.jar</code> anywhere a JVM exists. This is why Spring Boot JARs are sometimes called "fat jars."
+  </div>
+
+  <h3>13.2 Database migrations</h3>
+  <p>ASP.NET Core ships its migration tooling as part of the EF Core toolchain; Spring Boot has no built-in migration tool and typically pairs with Flyway or Liquibase.</p>
+  <div class="code-grid">
+    <div class="code-block dotnet">
+      <div class="label">ASP.NET Core — EF Core migrations</div>
+      <pre><code><span class="cmt"># One-time: install the EF Core CLI tool globally</span>
+dotnet tool install --global dotnet-ef
+
+<span class="cmt"># Also needs these NuGet packages in the .csproj:
+#   Microsoft.EntityFrameworkCore.Design
+#   Microsoft.EntityFrameworkCore.SqlServer (or provider of choice)
+
+# Create a migration from your entity changes</span>
+dotnet ef migrations add AddOrderStatusColumn
+
+<span class="cmt"># Apply pending migrations to the database</span>
+dotnet ef database update
+
+<span class="cmt"># Package Manager Console equivalents inside Visual Studio:
+#   Add-Migration AddOrderStatusColumn
+#   Update-Database</span></code></pre>
+    </div>
+    <div class="code-block spring">
+      <div class="label">Spring Boot — Flyway migrations</div>
+      <pre><code><span class="cmt">&lt;!-- pom.xml: add the Flyway dependency (no separate CLI install needed) --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.flywaydb&lt;/groupId&gt;
+    &lt;artifactId&gt;flyway-core&lt;/artifactId&gt;
+&lt;/dependency&gt;</span>
+
+<span class="cmt"># Migrations are plain versioned SQL files you write by hand,
+# placed under src/main/resources/db/migration/</span>
+<span class="cmt"># V1__create_orders_table.sql</span>
+CREATE TABLE orders (id BIGINT PRIMARY KEY, customer_name VARCHAR(100));
+
+<span class="cmt"># V2__add_order_status_column.sql</span>
+ALTER TABLE orders ADD COLUMN status VARCHAR(20);
+
+<span class="cmt"># Migrations run automatically on application startup —
+# no separate "update-database" command needed. To run manually:</span>
+mvn flyway:migrate</code></pre>
+    </div>
+  </div>
+  <div class="callout">
+    <strong>Key difference:</strong> EF Core <em>generates</em> migration code from your C# entity changes (code-first) — you rarely hand-write SQL. Flyway/Liquibase migrations are hand-written SQL (or XML/YAML for Liquibase) that you author yourself and version — Spring Data JPA can auto-create tables via Hibernate's <code>ddl-auto</code> for quick prototyping, but that's discouraged in production in favor of Flyway/Liquibase-managed, reviewable migration files.
+  </div>
+
+  <h3>13.3 Visual Studio 2026 (NuGet) vs Spring Boot dependencies — how many do you actually install?</h3>
+  <p>
+    For a typical CRUD Web API with a database, validation, object mapping, and Swagger docs, here's a realistic
+    package list on each side.
+  </p>
+  <div class="code-grid">
+    <div class="code-block dotnet">
+      <div class="label">ASP.NET Core — NuGet packages (Visual Studio 2026)</div>
+      <pre><code><span class="cmt">1.  Microsoft.EntityFrameworkCore.SqlServer   (DB provider)
+2.  Microsoft.EntityFrameworkCore.Design      (migrations design-time)
+3.  Microsoft.EntityFrameworkCore.Tools       (PMC commands)
+4.  AutoMapper.Extensions.Microsoft.DependencyInjection
+5.  FluentValidation.AspNetCore
+6.  Swashbuckle.AspNetCore                    (Swagger / OpenAPI UI)
+7.  Serilog.AspNetCore                        (structured logging)
+8.  Serilog.Sinks.Console
+9.  Microsoft.AspNetCore.Authentication.JwtBearer
+10. dotnet-ef                                 (global CLI tool, not project NuGet)
+
+<span class="cmt">→ ~9–10 explicit NuGet installs for a full-featured API</span></span></code></pre>
+    </div>
+    <div class="code-block spring">
+      <div class="label">Spring Boot — Starters (Maven/Gradle, via Spring Initializr)</div>
+      <pre><code><span class="cmt">1. spring-boot-starter-web        (MVC + embedded Tomcat + Jackson JSON)
+2. spring-boot-starter-data-jpa   (Hibernate + Spring Data repositories)
+3. spring-boot-starter-validation (Bean Validation / Hibernate Validator)
+4. springdoc-openapi-starter-webmvc-ui  (Swagger / OpenAPI UI)
+5. spring-boot-starter-security   (JWT/auth support, if needed)
+6. flyway-core                    (DB migrations)
+7. mapstruct + mapstruct-processor (object mapping)
+8. lombok                         (reduces boilerplate — optional)
+
+<span class="cmt">→ ~6–8 explicit dependency entries for the same feature set</span></span></code></pre>
+    </div>
+  </div>
+  <table style="margin-top:14px;">
+    <tr><th>Aspect</th><th class="dotnet-col">ASP.NET Core / NuGet</th><th class="spring-col">Spring Boot / Maven-Gradle</th></tr>
+    <tr><td>Granularity</td><td class="dotnet-col">More granular — packages tend to map 1:1 to a single library (SQL provider, tools, logging sink each separate)</td><td class="spring-col">Coarser — a "starter" bundles a whole feature area (e.g. <code>spring-boot-starter-web</code> alone brings in the server, MVC, and JSON serializer together)</td></tr>
+    <tr><td>Typical count for a full CRUD API</td><td class="dotnet-col">Roughly 9–10 explicit package installs</td><td class="spring-col">Roughly 6–8 explicit dependency entries</td></tr>
+    <tr><td>Transitive dependencies</td><td class="dotnet-col">Fewer transitive packages per install (each NuGet package is narrower in scope)</td><td class="spring-col">Each starter transitively pulls in many more JARs behind the scenes — the visible list is shorter, but the actual dependency tree is often larger</td></tr>
+    <tr><td>Where you pick them</td><td class="dotnet-col">Visual Studio's NuGet Package Manager (Browse tab, per-project), or <code>dotnet add package &lt;name&gt;</code></td><td class="spring-col">Usually chosen up front at <a href="https://start.spring.io" target="_blank" rel="noopener">start.spring.io</a> (Spring Initializr) when the project is generated, then edited directly in <code>pom.xml</code>/<code>build.gradle</code></td></tr>
+    <tr><td>IDE role</td><td class="dotnet-col">Visual Studio 2026 has a built-in NuGet UI — no separate plugin needed to manage packages themselves, just the .NET workload during VS install</td><td class="spring-col">IntelliJ/Eclipse/VS Code need a Java + Spring extension pack installed once; after that, dependency management happens through Maven/Gradle files rather than an IDE package browser</td></tr>
+  </table>
+  <div class="callout">
+    <strong>Bottom line:</strong> for equivalent functionality, ASP.NET Core in Visual Studio 2026 usually means installing a few more <em>individual</em> NuGet packages since each does one narrow job, while Spring Boot's starter model means fewer entries in your build file for the same result — because each starter is really a curated bundle of several libraries. Neither is "more" or "less" overall; the difference is bundling philosophy, not raw capability.
+  </div>
+</section>
+
+<section id="syntax-cheatsheet">
+  <h2>14. Common Syntax Cheat Sheet — C# vs Java</h2>
+  <p>Framework differences aside, day-to-day coding speed comes down to base language syntax. Here's a quick reference for the constructs you'll type constantly.</p>
+
+  <h3>14.1 Variables, strings &amp; null handling</h3>
+  <div class="code-grid">
+    <div class="code-block dotnet">
+      <div class="label">C# (ASP.NET Core)</div>
+      <pre><code><span class="cmt">// Type inference</span>
+<span class="kw">var</span> name = <span class="str">"Anna"</span>;
+<span class="kw">var</span> total = 199.90m;
+
+<span class="cmt">// String interpolation</span>
+<span class="kw">var</span> msg = $<span class="str">"Order {orderId} total: {total:C}"</span>;
+
+<span class="cmt">// Null-conditional &amp; null-coalescing</span>
+<span class="type">string</span>? city = customer?.Address?.City;
+<span class="type">string</span> display = city ?? <span class="str">"Unknown"</span>;
+
+<span class="cmt">// Nullable reference types (compiler-enforced)</span>
+<span class="type">Order</span>? order = <span class="kw">await</span> _repo.FindAsync(id);
+<span class="kw">if</span> (order <span class="kw">is null</span>) <span class="kw">return</span> NotFound();</code></pre>
+    </div>
+    <div class="code-block spring">
+      <div class="label">Java (Spring Boot)</div>
+      <pre><code><span class="cmt">// Type inference (Java 10+)</span>
+<span class="kw">var</span> name = <span class="str">"Anna"</span>;
+<span class="kw">var</span> total = 199.90;
+
+<span class="cmt">// String interpolation (no native syntax — String.format / +)</span>
+<span class="type">String</span> msg = <span class="type">String</span>.format(<span class="str">"Order %d total: %.2f"</span>, orderId, total);
+
+<span class="cmt">// Optional for null-safety (opt-in, not compiler-enforced)</span>
+<span class="type">Optional</span>&lt;<span class="type">String</span>&gt; city = Optional.ofNullable(customer)
+    .map(Customer::getAddress)
+    .map(Address::getCity);
+<span class="type">String</span> display = city.orElse(<span class="str">"Unknown"</span>);
+
+<span class="cmt">// Plain null checks are still the norm for regular fields</span>
+<span class="type">Order</span> order = repository.findById(id).orElse(<span class="kw">null</span>);
+<span class="kw">if</span> (order == <span class="kw">null</span>) <span class="kw">return</span> ResponseEntity.notFound().build();</code></pre>
+    </div>
+  </div>
+
+  <h3>14.2 Collections &amp; loops</h3>
+  <div class="code-grid">
+    <div class="code-block dotnet">
+      <div class="label">C#</div>
+      <pre><code><span class="type">List</span>&lt;<span class="type">int</span>&gt; nums = <span class="kw">new</span>() { 1, 2, 3, 4, 5 };
+
+<span class="kw">foreach</span> (<span class="kw">var</span> n <span class="kw">in</span> nums)
+    Console.WriteLine(n);
+
+<span class="cmt">// LINQ</span>
+<span class="kw">var</span> evens = nums.Where(n =&gt; n % 2 == 0).ToList();
+<span class="kw">var</span> total = nums.Sum();
+<span class="kw">var</span> names = orders.Select(o =&gt; o.CustomerName).Distinct();
+
+<span class="cmt">// Dictionary</span>
+<span class="type">Dictionary</span>&lt;<span class="type">string</span>, <span class="type">int</span>&gt; scores = <span class="kw">new</span>()
+{
+    [<span class="str">"alice"</span>] = 90,
+    [<span class="str">"bob"</span>] = 85
+};</code></pre>
+    </div>
+    <div class="code-block spring">
+      <div class="label">Java</div>
+      <pre><code><span class="type">List</span>&lt;<span class="type">Integer</span>&gt; nums = <span class="type">List</span>.of(1, 2, 3, 4, 5);
+
+<span class="kw">for</span> (<span class="type">int</span> n : nums)
+    System.out.println(n);
+
+<span class="cmt">// Stream API</span>
+<span class="type">List</span>&lt;<span class="type">Integer</span>&gt; evens = nums.stream()
+    .filter(n -&gt; n % 2 == 0)
+    .toList();
+<span class="type">int</span> total = nums.stream().mapToInt(Integer::intValue).sum();
+<span class="type">List</span>&lt;<span class="type">String</span>&gt; names = orders.stream()
+    .map(Order::getCustomerName)
+    .distinct().toList();
+
+<span class="cmt">// Map</span>
+<span class="type">Map</span>&lt;<span class="type">String</span>, <span class="type">Integer</span>&gt; scores = <span class="type">Map</span>.of(
+    <span class="str">"alice"</span>, 90,
+    <span class="str">"bob"</span>, 85
+);</code></pre>
+    </div>
+  </div>
+
+  <h3>14.3 Conditionals, pattern matching &amp; exceptions</h3>
+  <div class="code-grid">
+    <div class="code-block dotnet">
+      <div class="label">C#</div>
+      <pre><code><span class="cmt">// Ternary + pattern matching switch expression</span>
+<span class="type">string</span> label = status <span class="kw">switch</span>
+{
+    <span class="type">OrderStatus</span>.Pending =&gt; <span class="str">"Waiting"</span>,
+    <span class="type">OrderStatus</span>.Shipped =&gt; <span class="str">"On the way"</span>,
+    _ =&gt; <span class="str">"Unknown"</span>
+};
+
+<span class="cmt">// Try/catch</span>
+<span class="kw">try</span>
+{
+    <span class="kw">await</span> _service.ProcessAsync(id);
+}
+<span class="kw">catch</span> (<span class="type">OrderNotFoundException</span> ex)
+{
+    <span class="kw">return</span> NotFound(ex.Message);
+}
+<span class="kw">catch</span> (<span class="type">Exception</span> ex) <span class="kw">when</span> (ex <span class="kw">is</span> <span class="type">TimeoutException</span>)
+{
+    <span class="kw">return</span> StatusCode(504);
+}</code></pre>
+    </div>
+    <div class="code-block spring">
+      <div class="label">Java</div>
+      <pre><code><span class="cmt">// Ternary + pattern matching switch expression (Java 14+)</span>
+<span class="type">String</span> label = <span class="kw">switch</span> (status) {
+    <span class="kw">case</span> PENDING -&gt; <span class="str">"Waiting"</span>;
+    <span class="kw">case</span> SHIPPED -&gt; <span class="str">"On the way"</span>;
+    <span class="kw">default</span> -&gt; <span class="str">"Unknown"</span>;
+};
+
+<span class="cmt">// Try/catch</span>
+<span class="kw">try</span> {
+    service.process(id);
+} <span class="kw">catch</span> (<span class="type">OrderNotFoundException</span> ex) {
+    <span class="kw">return</span> ResponseEntity.status(404).body(ex.getMessage());
+} <span class="kw">catch</span> (<span class="type">TimeoutException</span> ex) {
+    <span class="kw">return</span> ResponseEntity.status(504).build();
+}</code></pre>
+    </div>
+  </div>
+
+  <h3>14.4 Async keyword syntax quick reference</h3>
+  <table>
+    <tr><th>Concept</th><th class="dotnet-col">C# / ASP.NET Core</th><th class="spring-col">Java / Spring Boot</th></tr>
+    <tr><td>Declare an async method</td><td class="dotnet-col"><code>public async Task&lt;Order&gt; GetAsync(int id)</code></td><td class="spring-col"><code>public CompletableFuture&lt;Order&gt; get(Long id)</code> or <code>Mono&lt;Order&gt; get(Long id)</code></td></tr>
+    <tr><td>Await a result</td><td class="dotnet-col"><code>var order = await repo.FindAsync(id);</code></td><td class="spring-col"><code>future.thenApply(order -&gt; ...)</code> or <code>mono.map(order -&gt; ...)</code> (no <code>await</code> keyword in Java)</td></tr>
+    <tr><td>Run tasks concurrently</td><td class="dotnet-col"><code>await Task.WhenAll(t1, t2);</code></td><td class="spring-col"><code>CompletableFuture.allOf(f1, f2)</code> or <code>Mono.zip(m1, m2)</code></td></tr>
+    <tr><td>Fire-and-forget error handling</td><td class="dotnet-col"><code>try { await x(); } catch (Exception ex) { ... }</code> — normal try/catch works across awaits</td><td class="spring-col"><code>future.exceptionally(ex -&gt; ...)</code> or <code>mono.onErrorResume(ex -&gt; ...)</code> — callback-based, not try/catch</td></tr>
+  </table>
+  <div class="callout">
+    <strong>Biggest syntax-level gap:</strong> C#'s <code>await</code> lets you write async code that reads exactly like synchronous code, including normal <code>try/catch</code>. Java has no equivalent keyword — <code>CompletableFuture</code> and <code>Mono</code>/<code>Flux</code> are both callback/operator-chain based, so async Java code structurally looks different from synchronous Java code, whereas async C# looks almost identical to synchronous C#.
+  </div>
+</section>
+
+<section id="ef-jpa-methods">
+  <h2>15. EF Core Async Methods vs Spring Data JPA — Common Methods Cheat Sheet</h2>
+  <p>
+    In ASP.NET Core with EF Core, most database calls end in <code>Async</code> — <code>await</code>-able,
+    non-blocking operations (see <a href="#async">section 4</a> for why). Spring Data JPA doesn't use an
+    <code>Async</code> naming convention by default (its repository calls are blocking unless you explicitly
+    wrap them in <code>@Async</code>/<code>CompletableFuture</code>, or move to reactive R2DBC). The table below
+    maps the EF Core methods you'll see constantly to their closest Spring Data JPA equivalent.
+  </p>
+
+  <h3>15.1 Your list, plus the ones it's missing</h3>
+  <table>
+    <tr><th>ASP.NET Core / EF Core</th><th class="spring-col">Spring Boot / JPA</th><th>Purpose</th></tr>
+    <tr><td><code>AnyAsync()</code></td><td class="spring-col"><code>existsBy...()</code> / <code>existsById()</code></td><td>Check whether a record exists</td></tr>
+    <tr><td><code>FirstOrDefaultAsync()</code></td><td class="spring-col"><code>findFirstBy...()</code> / <code>Optional&lt;T&gt;</code></td><td>Get first record or null</td></tr>
+    <tr><td><code>SingleOrDefaultAsync()</code></td><td class="spring-col">Custom query expecting one result (throws if &gt;1)</td><td>Exactly one or none</td></tr>
+    <tr><td><code>FindAsync()</code></td><td class="spring-col"><code>findById()</code></td><td>Find by primary key</td></tr>
+    <tr><td><code>ToListAsync()</code></td><td class="spring-col"><code>findAll()</code> / query returning <code>List&lt;T&gt;</code></td><td>Load many records</td></tr>
+    <tr><td><code>CountAsync()</code></td><td class="spring-col"><code>count()</code> / <code>countBy...()</code></td><td>Count records</td></tr>
+    <tr><td><code>SaveChangesAsync()</code></td><td class="spring-col">Usually automatic on <code>@Transactional</code> commit / <code>save()</code></td><td>Persist changes</td></tr>
+    <tr><td><code>AddAsync()</code></td><td class="spring-col"><code>save()</code></td><td>Insert entity</td></tr>
+    <tr><td><code>Remove()</code></td><td class="spring-col"><code>delete()</code></td><td>Delete entity</td></tr>
+    <tr><td><code>Where()</code></td><td class="spring-col">Derived query method / Criteria / <code>Specification</code></td><td>Filter</td></tr>
+    <tr><td><code>Select()</code></td><td class="spring-col">DTO projection (interface or constructor expression)</td><td>Select fields</td></tr>
+    <tr><td><code>OrderBy()</code></td><td class="spring-col"><code>Sort.by(...)</code> / <code>OrderBy</code> method naming</td><td>Sort</td></tr>
+    <tr><td><code>Include()</code></td><td class="spring-col"><code>JOIN FETCH</code> / <code>@EntityGraph</code></td><td>Load related entity</td></tr>
+    <tr style="background:rgba(124,158,255,0.06);"><td colspan="3" style="color:var(--accent); font-weight:600;">Additional common methods worth knowing</td></tr>
+    <tr><td><code>Skip()</code> / <code>Take()</code></td><td class="spring-col"><code>Pageable</code> / <code>PageRequest.of(page, size)</code></td><td>Pagination</td></tr>
+    <tr><td><code>MaxAsync()</code> / <code>MinAsync()</code></td><td class="spring-col"><code>findTopByOrderBy...Desc/Asc()</code> or JPQL <code>MAX()</code>/<code>MIN()</code></td><td>Aggregate max/min</td></tr>
+    <tr><td><code>SumAsync()</code> / <code>AverageAsync()</code></td><td class="spring-col">JPQL <code>SUM()</code>/<code>AVG()</code> in a <code>@Query</code></td><td>Aggregate sum/average</td></tr>
+    <tr><td><code>GroupBy()</code></td><td class="spring-col">JPQL <code>GROUP BY</code> in <code>@Query</code>, or <code>Collectors.groupingBy</code> in-memory</td><td>Group results</td></tr>
+    <tr><td><code>FirstAsync()</code> (throws if none)</td><td class="spring-col"><code>findFirstBy...().orElseThrow()</code></td><td>First record, error if missing</td></tr>
+    <tr><td><code>AsNoTracking()</code></td><td class="spring-col"><code>@Transactional(readOnly = true)</code> or <code>@QueryHints</code> read-only fetch</td><td>Read-only query (skip change tracking)</td></tr>
+    <tr><td><code>ExecuteUpdateAsync()</code> (EF Core 7+)</td><td class="spring-col"><code>@Modifying @Query("UPDATE ...")</code></td><td>Bulk update without loading entities</td></tr>
+    <tr><td><code>ExecuteDeleteAsync()</code> (EF Core 7+)</td><td class="spring-col"><code>@Modifying @Query("DELETE ...")</code> or <code>deleteAllInBatch()</code></td><td>Bulk delete without loading entities</td></tr>
+    <tr><td><code>AddRangeAsync()</code></td><td class="spring-col"><code>saveAll()</code></td><td>Insert multiple entities</td></tr>
+    <tr><td><code>RemoveRange()</code></td><td class="spring-col"><code>deleteAll()</code> / <code>deleteAllInBatch()</code></td><td>Delete multiple entities</td></tr>
+    <tr><td><code>FromSqlInterpolated()</code> / <code>FromSqlRaw()</code></td><td class="spring-col"><code>@Query(nativeQuery = true)</code></td><td>Raw/native SQL query</td></tr>
+    <tr><td><code>ExecuteSqlRawAsync()</code></td><td class="spring-col"><code>jdbcTemplate.update()</code> or native <code>@Modifying</code> query</td><td>Execute raw SQL command</td></tr>
+    <tr><td><code>Distinct()</code></td><td class="spring-col"><code>@Query</code> with <code>SELECT DISTINCT</code>, or <code>.distinct()</code> on a Java <code>Stream</code></td><td>Remove duplicates</td></tr>
+    <tr><td><code>ReloadAsync()</code></td><td class="spring-col"><code>entityManager.refresh(entity)</code></td><td>Reload entity state from the DB</td></tr>
+    <tr><td><code>BeginTransactionAsync()</code></td><td class="spring-col"><code>@Transactional</code> (declarative, method-level)</td><td>Start a DB transaction</td></tr>
+  </table>
+
+  <h3>15.2 A few of these in code</h3>
+  <div class="code-grid">
+    <div class="code-block dotnet">
+      <div class="label">EF Core — paging, exists check, bulk update</div>
+      <pre><code><span class="cmt">// Pagination</span>
+<span class="kw">var</span> page = <span class="kw">await</span> _db.Orders
+    .OrderByDescending(o =&gt; o.CreatedAt)
+    .Skip((pageNumber - 1) * pageSize)
+    .Take(pageSize)
+    .ToListAsync();
+
+<span class="cmt">// Exists check — no entity materialized</span>
+<span class="kw">bool</span> hasPending = <span class="kw">await</span> _db.Orders
+    .AnyAsync(o =&gt; o.Status == <span class="type">OrderStatus</span>.Pending);
+
+<span class="cmt">// Bulk update — EF Core 7+, no SELECT then loop-and-save</span>
+<span class="kw">await</span> _db.Orders
+    .Where(o =&gt; o.Status == <span class="type">OrderStatus</span>.Pending)
+    .ExecuteUpdateAsync(setters =&gt; setters
+        .SetProperty(o =&gt; o.Status, <span class="type">OrderStatus</span>.Cancelled));
+
+<span class="cmt">// Read-only, no change tracking overhead</span>
+<span class="kw">var</span> report = <span class="kw">await</span> _db.Orders
+    .AsNoTracking()
+    .Where(o =&gt; o.CreatedAt &gt; since)
+    .ToListAsync();</code></pre>
+    </div>
+    <div class="code-block spring">
+      <div class="label">Spring Data JPA — paging, exists check, bulk update</div>
+      <pre><code><span class="cmt">// Pagination</span>
+<span class="type">Page</span>&lt;<span class="type">Order</span>&gt; page = orderRepository.findAll(
+    PageRequest.of(pageNumber - 1, pageSize,
+        Sort.by(Sort.Direction.DESC, <span class="str">"createdAt"</span>)));
+
+<span class="cmt">// Exists check — no entity materialized</span>
+<span class="kw">boolean</span> hasPending = orderRepository
+    .existsByStatus(OrderStatus.PENDING);
+
+<span class="cmt">// Bulk update — derived @Modifying query</span>
+<span class="kw">@Modifying</span>
+<span class="kw">@Transactional</span>
+<span class="kw">@Query</span>(<span class="str">"UPDATE Order o SET o.status = :newStatus WHERE o.status = :oldStatus"</span>)
+<span class="kw">void</span> bulkUpdateStatus(
+    <span class="kw">@Param</span>(<span class="str">"oldStatus"</span>) <span class="type">OrderStatus</span> oldStatus,
+    <span class="kw">@Param</span>(<span class="str">"newStatus"</span>) <span class="type">OrderStatus</span> newStatus);
+
+<span class="cmt">// Read-only, hints Hibernate to skip dirty-checking</span>
+<span class="kw">@Transactional</span>(readOnly = <span class="kw">true</span>)
+<span class="kw">public</span> <span class="type">List</span>&lt;<span class="type">Order</span>&gt; getReport(<span class="type">LocalDateTime</span> since) {
+    <span class="kw">return</span> orderRepository.findByCreatedAtAfter(since);
+}</code></pre>
+    </div>
+  </div>
+
+  <div class="callout">
+    <strong>Naming convention difference:</strong> EF Core's <code>Async</code> suffix is a strict convention — if a method touches the database, it almost always has an async twin (<code>ToListAsync</code>, <code>FirstOrDefaultAsync</code>, etc.), because ASP.NET Core treats async as the default (see <a href="#async">section 4</a>). Spring Data JPA repository methods are synchronous/blocking by default with <strong>no naming convention for async</strong> — if you need non-blocking calls, you either wrap them yourself with <code>@Async</code> + <code>CompletableFuture</code>, or switch to Spring Data R2DBC repositories entirely, which return <code>Mono</code>/<code>Flux</code> instead of blocking types.
+  </div>
+</section>
+
+<section id="summary">
+  <h2>16. Quick Summary</h2>
+  <p>
+    <span class="badge dotnet">ASP.NET Core</span> Single, async-first model. Less choice, more consistency. Strong first-party async tooling (EF Core, HttpClient) makes scalable I/O-bound APIs straightforward without changing architecture.
+  </p>
+  <p>
+    <span class="badge spring">Spring Boot</span> Mature ecosystem with more flexibility: stick with the simple blocking MVC model for most CRUD apps, or opt into WebFlux for high-concurrency, streaming, or reactive use cases — at the cost of a steeper learning curve and a different data-access stack.
+  </p>
+  <p>
+    <span class="badge legacy">.NET Framework 4.8</span> Windows/IIS-only, XML config, no built-in DI, two separate MVC/Web API pipelines — still common in legacy enterprise systems but in maintenance mode.
+  </p>
+  <p>
+    <span class="badge modern">.NET 8/10</span> Cross-platform, faster, unified controller pipeline, built-in DI, JSON config with strong typing — the target for new development and legacy migrations alike.
+  </p>
+</section>
+
+</main>
+
+<footer>
+  ASP.NET Core vs Spring Boot — reference comparison
+</footer>
+
+</div>
+
+<script>
+  // Highlight the sidebar link matching the section currently in view
+  const links = document.querySelectorAll('.sidebar nav a');
+  const sections = Array.from(links).map(a => document.querySelector(a.getAttribute('href')));
+  function setActive() {
+    let current = sections[0];
+    for (const sec of sections) {
+      if (sec && sec.getBoundingClientRect().top - 80 <= 0) current = sec;
+    }
+    links.forEach(a => {
+      a.classList.toggle('active', a.getAttribute('href') === '#' + (current && current.id));
+    });
+  }
+  document.addEventListener('scroll', setActive);
+  setActive();
+</script>
+
+</body>
+</html>
